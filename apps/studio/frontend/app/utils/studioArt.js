@@ -34,6 +34,12 @@ export function styleExample(styleValue) {
   return `${STUDIO_ART_ROOT}/styles/${styleValue}.webp`
 }
 
+/** Example image of a cinematic technique (backend core/generation/cinematic-techniques.ts), e.g. "lighting.neon".
+ *  Every technique shows the same scene, so the cards compare; callers keep the text-only card when it fails to load. */
+export function cinematicArt(techniqueId) {
+  return typeof techniqueId === 'string' && /^[a-z]+\.[a-z0-9-]+$/.test(techniqueId) ? `${STUDIO_ART_ROOT}/cinematic/${techniqueId}.webp` : ''
+}
+
 /** Ad-style photos of the AI Seller / AI Marketer / AI Live / Skill library menus (banners, workflow cards). */
 export const MENU_ART_IDS = [
   'hero-seller', 'hero-marketer', 'hero-live', 'hero-skills',

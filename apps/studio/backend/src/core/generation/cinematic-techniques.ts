@@ -3,8 +3,9 @@
  * short dramas). The names are the industry's standard vocabulary; every description and prompt here is written for
  * NAKA-AI, not copied from any other library (studio-templates.ts has the same rule).
  *
- * A member picks at most one technique per group. The picks become one "Cinematography:" line in the image and video
- * prompts (cinematicPrompt); camera movement only reaches video prompts, because a still image cannot move.
+ * A member picks at most one technique per group. The shot planning agents are told the picks (cinematicDirective), and
+ * every pick but the framing becomes one "Cinematography:" line in the image and video prompts (cinematicPrompt);
+ * camera movement only reaches video prompts, because a still image cannot move.
  */
 
 export type CinematicGroup = 'shot' | 'movement' | 'lighting' | 'composition' | 'lens' | 'look' | 'pacing'
@@ -214,10 +215,34 @@ export function normalizeCinematic(input: unknown): string[] {
   return CINEMATIC_GROUPS.map(g => picked.get(g.id)).filter((id): id is string => !!id)
 }
 
+/**
+ * Groups the shot planner applies shot by shot instead of a line on every prompt: a picked framing is the default the
+ * agent writes into each shot, so a reaction close-up in a "wide shot" video is not also told to be wide.
+ */
+const PLANNER_ONLY: ReadonlySet<CinematicGroup> = new Set(['shot'])
+
 /** The "Cinematography:" line for a prompt, or '' when nothing applies. Movement and timing only reach video. */
 export function cinematicPrompt(ids: unknown, kind: 'image' | 'video'): string {
   const parts = normalizeCinematic(ids).map(id => BY_ID.get(id)!)
-    .filter(t => CINEMATIC_GROUPS.find(g => g.id === t.group)![kind])
+    .filter(t => !PLANNER_ONLY.has(t.group) && CINEMATIC_GROUPS.find(g => g.id === t.group)![kind])
     .map(t => t.prompt)
   return parts.length ? `Cinematography: ${parts.join('; ')}` : ''
+}
+
+/**
+ * What the shot planning agents (storyboard, prompt writer, product review director) are told about the picks, so
+ * they plan shots that suit them and write the framing per shot. '' when nothing is picked.
+ */
+export function cinematicDirective(ids: unknown): string {
+  const picks = normalizeCinematic(ids).map(id => BY_ID.get(id)!)
+  if (!picks.length) return ''
+  const shot = picks.find(t => PLANNER_ONLY.has(t.group))
+  const appended = picks.filter(t => !PLANNER_ONLY.has(t.group))
+  return [
+    '## Cinematic techniques chosen by the user',
+    'The user picked these for this video. Plan every shot so they fit: choose action, settings and moments that show them off, and never describe a look that conflicts with them (for example harsh noon sun when moonlight was picked).',
+    ...picks.map(t => `- ${CINEMATIC_GROUPS.find(g => g.id === t.group)!.name}: ${t.name} (${t.prompt})`),
+    shot ? `Framing: "${shot.name}" is the default. Use it for most shots and write it into each shot's image and video prompt, but change the framing where the story needs it (a reaction close-up, a product detail, an establishing shot).` : '',
+    appended.length ? 'Every other pick is added to each image and video prompt automatically, so do not repeat it in the prompts you write.' : '',
+  ].filter(Boolean).join('\n')
 }

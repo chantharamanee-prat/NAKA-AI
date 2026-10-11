@@ -46,8 +46,17 @@ test('the skills library has a shelf of the techniques with group chips and a pi
   assert.match(studio, /@new-video="switchTab\('projects'\); openCreate\(\)"/)
 })
 
+test('shelf cards show the example image, open it large, and keep the text card when the image is missing', () => {
+  assert.match(library, /<img :src="cinematicArt\(x\.id\)" alt="" loading="lazy"[^>]*@error="artFailed\[x\.id\] = true">/)
+  assert.match(library, /v-if="!artFailed\[x\.id\]"/)
+  assert.match(library, /@click="openView\(x\)"/)
+  assert.match(library, /<dialog ref="viewDialog" class="sl-cine-view" aria-labelledby="sl-cine-view-title"/)
+  assert.match(library, /@click="toggleNext\(viewing\.id\)"/, 'pick from the large view too')
+  assert.match(library, /import \{ cinematicArt, /)
+})
+
 test('both languages have every cinematic text', () => {
-  const keys = ['title', 'hint', 'none', 'clear', 'loadError', 'shelf', 'shelfHint', 'use', 'used', 'pending']
+  const keys = ['title', 'hint', 'none', 'clear', 'loadError', 'shelf', 'shelfHint', 'use', 'used', 'pending', 'view', 'strip', 'stripHint']
   for (const lang of ['th', 'en']) {
     const texts = JSON.parse(read(`app/locales/${lang}.json`)).components.cinematic
     for (const k of keys) assert.ok(texts[k], `${lang}: components.cinematic.${k}`)

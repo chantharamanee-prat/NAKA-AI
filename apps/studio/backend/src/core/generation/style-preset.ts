@@ -4,7 +4,7 @@
  */
 import { and, eq } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
-import { cinematicPrompt } from './cinematic-techniques.js'
+import { cinematicPrompt, normalizeCinematic } from './cinematic-techniques.js'
 
 /** style value of a drama whose look the author typed in (drama page → Art Style → Custom) */
 export const CUSTOM_STYLE = 'custom'
@@ -32,23 +32,30 @@ export async function getDramaStylePrompt(dramaId: number | null | undefined): P
   return preset?.prompt || ''
 }
 
+/** The cinematic technique ids picked for a product video (studio_projects.cinematic); [] when none. */
+export async function getProjectCinematic(projectId: number | null | undefined): Promise<string[]> {
+  if (!projectId) return []
+  const [project] = await db.select({ cinematic: schema.studioProjects.cinematic }).from(schema.studioProjects)
+    .where(eq(schema.studioProjects.id, projectId))
+  try { return normalizeCinematic(project?.cinematic ? JSON.parse(project.cinematic) : null) } catch { return [] }
+}
+
 /**
- * The cinematic techniques picked for a drama (cinematic-techniques.ts), as the "Cinematography:" line for a shot's
- * image or video prompt. A drama keeps its picks in metadata.cinematic; a product video's hidden drama
- * (metadata.studioProjectId) uses its project's studio_projects.cinematic. '' when nothing is picked.
+ * The cinematic technique ids picked for a drama (cinematic-techniques.ts). A drama keeps its picks in
+ * metadata.cinematic; a product video's hidden drama (metadata.studioProjectId) uses its project's picks. [] when none.
  */
-export async function getDramaCinematicPrompt(dramaId: number | null | undefined, kind: 'image' | 'video'): Promise<string> {
-  if (!dramaId) return ''
+export async function getDramaCinematic(dramaId: number | null | undefined): Promise<string[]> {
+  if (!dramaId) return []
   const [drama] = await db.select({ metadata: schema.dramas.metadata }).from(schema.dramas).where(eq(schema.dramas.id, dramaId))
   let meta: any = null
   try { meta = drama?.metadata ? JSON.parse(drama.metadata) : null } catch { /* not JSON: nothing picked */ }
-  let picks: unknown = meta?.cinematic
-  if (!Array.isArray(picks) && Number.isInteger(meta?.studioProjectId)) {
-    const [project] = await db.select({ cinematic: schema.studioProjects.cinematic }).from(schema.studioProjects)
-      .where(eq(schema.studioProjects.id, meta.studioProjectId))
-    try { picks = project?.cinematic ? JSON.parse(project.cinematic) : null } catch { picks = null }
-  }
-  return cinematicPrompt(picks, kind)
+  if (Array.isArray(meta?.cinematic)) return normalizeCinematic(meta.cinematic)
+  return Number.isInteger(meta?.studioProjectId) ? getProjectCinematic(meta.studioProjectId) : []
+}
+
+/** The drama's picks as the "Cinematography:" line for a shot's image or video prompt; '' when nothing applies. */
+export async function getDramaCinematicPrompt(dramaId: number | null | undefined, kind: 'image' | 'video'): Promise<string> {
+  return cinematicPrompt(await getDramaCinematic(dramaId), kind)
 }
 
 /** The drama a storyboard (shot) belongs to, through its episode; null when it has none. */

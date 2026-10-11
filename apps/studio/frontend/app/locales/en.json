@@ -102,7 +102,7 @@
     },
     "cinematic": {
       "title": "Cinematic techniques",
-      "hint": "Pick up to one per group. They are added to the image and video prompts of every shot (camera movement and timing apply to video only).",
+      "hint": "Pick up to one per group. The AI plans the shots around your picks: the shot size is the default framing and can still change where the story needs it, and the other picks are added to every shot's image and video prompts (camera movement and timing apply to video only).",
       "none": "None",
       "clear": "Clear all",
       "loadError": "Could not load the techniques. Try refreshing the page.",
@@ -110,7 +110,10 @@
       "shelfHint": "150 camera, lighting and composition techniques to use when creating a video",
       "use": "Use in my next video",
       "used": "Picked",
-      "pending": "{n} techniques will be used in the next video you create"
+      "pending": "{n} techniques will be used in the next video you create",
+      "view": "View the example of {name}",
+      "strip": "3 frames",
+      "stripHint": "Camera movement and timing cannot show in one still, so the example is three frames read from left to right."
     }
   },
   "composables": {
