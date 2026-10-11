@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f7f9fd">
+  <title>สถานะเซิร์ฟเวอร์ · หลังร้าน naka-ai</title>
+  <link rel="icon" href="/logo.svg?v=4" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <link rel="stylesheet" href="/admin/server/server.css">
+  <script src="/admin/admin-shell.js" defer></script>
+  <script src="/admin/admin-app.js" defer></script>
+  <script src="/admin/server/server.js" defer></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">ข้ามไปที่เนื้อหา</a>
+  <main id="main">
+    <section id="login" class="card login" aria-labelledby="login-title" hidden>
+      <div class="adm-login-brand"><img src="/logo.svg?v=4" alt="" width="34" height="34"><span>naka-ai · หลังร้าน</span></div>
+      <h1 id="login-title">เข้าสู่หลังร้าน</h1>
+      <p class="muted">ใช้บัญชี Google ของผู้ดูแลระบบ (อีเมลใน ADMIN_EMAILS) · ต้องเข้าใหม่ทุก 12 ชั่วโมง</p>
+      <a class="button primary" href="/api/auth/google/start?next=%2Fadmin%2Fserver%2F">เข้าสู่ระบบด้วย Google</a>
+      <p id="login-status" role="status" aria-live="polite"></p>
+      <details class="break-glass">
+        <summary>เข้าด้วยโทเคนฉุกเฉิน</summary>
+        <form id="login-form">
+          <label for="token">ADMIN_TOKEN (เก็บเฉพาะแท็บนี้)</label>
+          <input id="token" type="password" autocomplete="off" required>
+          <button type="submit">เข้าด้วยโทเคน</button>
+        </form>
+      </details>
+    </section>
+
+    <div id="app" hidden>
+      <div class="adm-head">
+        <div><h1>สถานะเซิร์ฟเวอร์</h1><p>เครื่องที่รัน naka-ai: ตัวทำงานเบื้องหลัง พื้นที่ดิสก์ ฐานข้อมูล และการสำรองข้อมูล (ของ Studio ดูที่ <a href="/admin/studio-system/">ระบบ Studio</a>)</p></div>
+        <div class="adm-account"><span class="who" data-adm-who></span><button id="refresh" type="button" class="btn-sm">โหลดใหม่</button><button id="logout" type="button" class="btn-sm">ออกจากระบบ</button></div>
+      </div>
+      <p id="status" role="status" aria-live="polite"></p>
+
+      <div id="board" hidden>
+        <ul id="alerts" class="alerts"></ul>
+        <div class="stat-grid">
+          <div class="stat"><p class="stat-label">ตัวทำงานเบื้องหลัง (cron)</p><b class="stat-value" id="s-cron"></b><p class="stat-sub" id="s-cron-sub"></p></div>
+          <div class="stat"><p class="stat-label">สำรองข้อมูลล่าสุด</p><b class="stat-value" id="s-backup"></b><p class="stat-sub" id="s-backup-sub"></p></div>
+          <div class="stat"><p class="stat-label">ฐานข้อมูล</p><b class="stat-value" id="s-db"></b><p class="stat-sub" id="s-db-sub"></p></div>
+          <div class="stat"><p class="stat-label">แอป naka-ai</p><b class="stat-value" id="s-app"></b><p class="stat-sub" id="s-app-sub"></p></div>
+        </div>
+
+        <section class="card" aria-labelledby="disk-title">
+          <h2 id="disk-title">พื้นที่ดิสก์</h2>
+          <ul class="usage" id="disks"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="backup-title">
+          <h2 id="backup-title">สำรองข้อมูล</h2>
+          <p id="backup-note" class="muted"></p>
+          <ul class="records" id="backups"></ul>
+          <details class="restore">
+            <summary>วิธีกู้ข้อมูลจากไฟล์สำรอง</summary>
+            <p>บนเครื่องเซิร์ฟเวอร์ ในโฟลเดอร์ที่ deploy ไว้ (แทน <code>FILE</code> ด้วยชื่อไฟล์ด้านบน) หยุดแอปก่อนกู้:</p>
+            <pre class="command">docker compose stop landing studio
+docker compose exec backup pg_restore -d naka --clean --if-exists /backups/FILE
+docker compose start landing studio</pre>
+            <p class="muted">ควรคัดลอกโฟลเดอร์สำรอง (volume <code>pg-backups</code>) ไปเก็บนอกเครื่องด้วย ไฟล์สำรองบนดิสก์เดียวกันจะหายไปพร้อมดิสก์</p>
+          </details>
+        </section>
+
+        <section class="card" aria-labelledby="db-title">
+          <h2 id="db-title">ฐานข้อมูล</h2>
+          <div class="split">
+            <div><h3>ตามระบบ</h3><ul class="usage" id="schemas"></ul></div>
+            <div><h3>ตารางที่ใหญ่ที่สุดของ naka-ai</h3><div class="table-wrap"><table><thead><tr><th scope="col">ตาราง</th><th scope="col" class="num">ประมาณแถว</th><th scope="col" class="num">ขนาด</th></tr></thead><tbody id="tables"></tbody></table></div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

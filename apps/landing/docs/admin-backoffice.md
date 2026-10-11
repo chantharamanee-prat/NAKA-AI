@@ -138,3 +138,34 @@ Owners create codes on การเงิน → โค้ดส่วนลด.
   site content, alerts, staff, and the bot's legacy unaudited credit route.
 - **The menu** hides owner-only pages for support staff.
 - **Removing staff** takes effect at their next request.
+
+## Reports (`src/admin/reports.ts`, page `/admin/reports/`)
+
+`GET /api/admin/reports?months=2..24` reports by Thailand month.
+- **Per month:** new customers, first-time payers, paying customers, revenue (counted on the day paid),
+  packages that ended without renewal, and credits used (naka-ai and studio).
+- **Funnel:** of the customers who signed up in the window, how many used credits and how many paid.
+- **Usage:** metered feature use per month (`feature_usage`), and naka-ai jobs by kind with their
+  failures.
+- **Top customers:** the ten who paid the most.
+- **Monthly revenue in force:** the packages active now, with a yearly package counted as a twelfth of
+  ten months' price.
+
+## Server status and backups (`src/admin/server-status.ts`, `server/server-info.ts`, page `/admin/server/`)
+
+- **Cron:** every run writes a `cron` heartbeat (`runtime_heartbeats`, migration `0011`). More than three
+  minutes without one shows as stopped.
+- **The machine:** the Node server passes `env.SERVER_INFO` (process, disks, backups). There is none on
+  Cloudflare, and the page says so.
+- **Database:** total size, size per schema, the biggest naka-ai tables and the number of connections.
+- **Backups:** the `backup` service in docker-compose.yml (`infra/backup/backup.sh`) works like this:
+  - It runs `pg_dump` of the whole database every `BACKUP_EVERY_HOURS` (default 24) into the `pg-backups`
+    volume, and keeps `BACKUP_KEEP_DAYS` (default 14).
+  - A dump is written as `.partial` and renamed only when complete. Owners and grants are kept.
+  - `last.json` records the latest run.
+  - The landing mounts the volume read-only (`BACKUP_DIR`). The page warns when the newest backup is older
+    than 36 hours or the last run failed.
+  - Restore as the page shows: `docker compose exec backup pg_restore -d naka --clean --if-exists /backups/<file>`
+    with the apps stopped. This was rehearsed in a throwaway container: each app owned its tables again and
+    could read them.
+  - Copy the volume off the machine too: a backup on the same disk does not survive the disk.

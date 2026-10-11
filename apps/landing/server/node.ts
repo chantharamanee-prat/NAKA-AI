@@ -22,6 +22,7 @@ import { assetsFetcher } from './assets';
 import { diskBucket } from './media';
 import { migrate } from './migrate';
 import { connect } from './postgres';
+import { serverInfo } from './server-info';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const role = (process.env.NAKA_ROLE ?? 'all').toLowerCase();
@@ -36,6 +37,8 @@ const env = {
   DB: d1OnPostgres(database.executor),
   ASSETS: assetsFetcher(path.join(root, 'public')),
   ...(process.env.MEDIA_DIR ? { MEDIA: diskBucket(process.env.MEDIA_DIR) } : {}),
+  // the back office's สถานะเซิร์ฟเวอร์ page (src/admin/server-status.ts)
+  SERVER_INFO: serverInfo(role),
 } as unknown as Env;
 
 // ctx.waitUntil: background work after a response; awaited before the process exits.

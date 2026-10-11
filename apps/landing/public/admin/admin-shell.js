@@ -20,6 +20,8 @@
     more: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     content: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m10 9 5 3-5 3z"/><path d="M3 7h18"/>',
+    chart: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
+    server: '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01"/><path d="M7 16.5h.01"/><path d="M11 7.5h6"/><path d="M11 16.5h6"/>',
     history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>',
   };
   // daily work first; the phone tab bar shows these four and puts the rest under "เพิ่มเติม"
@@ -28,6 +30,8 @@
     { href: '/admin/customers/', label: 'ลูกค้า', long: 'จัดการลูกค้า', icon: 'customers' },
     { href: '/admin/payments/', label: 'การเงิน', long: 'การเงิน', icon: 'money' },
     { href: '/admin/jobs/', label: 'งานล้มเหลว', long: 'งานที่ล้มเหลว', icon: 'alert', badge: 'jobs' },
+    { href: '/admin/reports/', label: 'รายงาน', long: 'รายงาน', icon: 'chart', more: true, group: 'daily' },
+    { href: '/admin/server/', label: 'สถานะเซิร์ฟเวอร์', long: 'สถานะเซิร์ฟเวอร์', icon: 'server', more: true },
     { href: '/admin/studio-system/', label: 'ระบบ Studio', long: 'ระบบ Studio', icon: 'studio', more: true },
     { href: '/admin/system/', label: 'ตั้งค่าระบบ', long: 'ตั้งค่าระบบ', icon: 'system', more: true, owner: true },
     { href: '/admin/content/', label: 'เนื้อหาเว็บ', long: 'เนื้อหาหน้าเว็บ', icon: 'content', more: true, owner: true },
@@ -63,7 +67,9 @@
     var nav = el('nav', { class: 'adm-nav', 'aria-label': 'เมนูหลังร้าน' });
     nav.append(el('p', { class: 'adm-nav-label' }, 'งานประจำวัน'));
     NAV.forEach(function (item, i) {
-      if (item.more && !NAV[i - 1].more) nav.append(el('p', { class: 'adm-nav-label' }, 'ระบบ'));
+      // sidebar groups: daily work, then the system (group defaults to daily for tab-bar items, system for the rest)
+      var group = item.group || (item.more ? 'system' : 'daily'), before = NAV[i - 1];
+      if (group === 'system' && before && (before.group || (before.more ? 'system' : 'daily')) !== 'system') nav.append(el('p', { class: 'adm-nav-label' }, 'ระบบ'));
       nav.append(link(item, true));
     });
     side.append(nav, el('div', { class: 'adm-side-foot' }, '<a href="/" target="_blank" rel="noopener">ดูหน้าเว็บ naka-ai ↗</a>'));
