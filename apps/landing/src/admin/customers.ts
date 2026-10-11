@@ -4,6 +4,7 @@ import { constantTimeEqual } from '../auth/common';
 import { ledgerFor } from '../credits';
 import { customerFeatures, FeatureAdminError, featureCatalog, setCustomerFeature } from './features';
 import { hashPassword, temporaryPassword } from '../auth/password';
+import { customerExtras } from './customer-tools';
 
 const BASE = '/api/admin/customers';
 const MONTH = 30 * 86400;
@@ -18,27 +19,32 @@ const CUSTOMER_SQL = `SELECT u.id, u.display_name AS name, u.status, u.created_a
   (SELECT email FROM auth_identities WHERE user_id = u.id AND provider IN ('google', 'password') ORDER BY provider, id LIMIT 1) AS email,
   CASE WHEN s.status = 'active' AND (s.expires_at IS NULL OR s.expires_at > ?1) THEN s.plan_id ELSE 'free' END AS planId,
   s.expires_at AS expiresAt,
-  (SELECT COALESCE(SUM(delta), 0) FROM credit_ledger WHERE user_id = u.id) AS credits
+  (SELECT COALESCE(SUM(delta), 0) FROM credit_ledger WHERE user_id = u.id) AS credits,
+  (SELECT COALESCE(json_agg(tag ORDER BY tag), '[]')::text FROM customer_tags WHERE user_id = u.id) AS tags
   FROM users u LEFT JOIN subscriptions s ON s.user_id = u.id`;
 
 async function customers(env: Env, url: URL): Promise<Response> {
   const query = (url.searchParams.get('q') ?? '').trim();
-  if (query.length > 200) throw new AdminError(400, 'คำค้นต้องไม่เกิน 200 ตัวอักษร');
+  const tag = (url.searchParams.get('tag') ?? '').trim();
+  if (query.length > 200 || tag.length > 30) throw new AdminError(400, 'คำค้นต้องไม่เกิน 200 ตัวอักษร');
   const phone = query.replace(/[\s()-]/g, '');
   const normalized = /^0\d{9}$/.test(phone) ? '+66' + phone.slice(1) : phone;
   // instr treats % and _ literally. All identities participate in the search, not just the displayed one.
+  // ?tag=: only customers with that tag (src/admin/customer-tools.ts)
   const { results } = await env.DB.prepare(`${CUSTOMER_SQL}
-    WHERE ?2 = '' OR instr(lower(u.id), lower(?2)) > 0 OR instr(lower(u.display_name), lower(?2)) > 0
+    WHERE (?2 = '' OR instr(lower(u.id), lower(?2)) > 0 OR instr(lower(u.display_name), lower(?2)) > 0
       OR EXISTS (SELECT 1 FROM auth_identities a WHERE a.user_id = u.id AND
-        ((a.provider = 'phone' AND instr(a.provider_uid, ?3) > 0) OR instr(lower(a.email), lower(?2)) > 0))
-    ORDER BY u.created_at DESC, u.id LIMIT 50`).bind(Math.floor(Date.now() / 1000), query, normalized || query).all();
-  return json({ customers: results });
+        ((a.provider = 'phone' AND instr(a.provider_uid, ?3) > 0) OR instr(lower(a.email), lower(?2)) > 0)))
+      AND (?4 = '' OR EXISTS (SELECT 1 FROM customer_tags t WHERE t.user_id = u.id AND lower(t.tag) = lower(?4)))
+    ORDER BY u.created_at DESC, u.id LIMIT 50`).bind(Math.floor(Date.now() / 1000), query, normalized || query, tag).all<{ tags: string }>();
+  return json({ customers: results.map(c => ({ ...c, tags: JSON.parse(c.tags) })) });
 }
 
 async function detail(env: Env, userId: string): Promise<Response> {
-  const customer = await env.DB.prepare(`${CUSTOMER_SQL} WHERE u.id = ?2`)
-    .bind(Math.floor(Date.now() / 1000), userId).first();
-  if (!customer) throw new AdminError(404, 'ไม่พบลูกค้านี้');
+  const row = await env.DB.prepare(`${CUSTOMER_SQL} WHERE u.id = ?2`)
+    .bind(Math.floor(Date.now() / 1000), userId).first<{ tags: string }>();
+  if (!row) throw new AdminError(404, 'ไม่พบลูกค้านี้');
+  const customer = { ...row, tags: JSON.parse(row.tags) };
   const [subscription, ledger, payments, receipts, socialAccounts, audit, plans] = await Promise.all([
     env.DB.prepare(`SELECT s.plan_id AS planId, p.name AS planName, s.status, s.expires_at AS expiresAt,
       s.billing_period AS period, s.next_credit_at AS nextCreditAt FROM subscriptions s
@@ -55,6 +61,7 @@ async function detail(env: Env, userId: string): Promise<Response> {
   ]);
   return json({ customer, subscription, ledger, payments: payments.results, receipts: receipts.results,
     ...(await customerFeatures(env, userId)), featureCatalog: await featureCatalog(env),
+    ...(await customerExtras(env, userId)),
     socialAccounts: socialAccounts.results, audit: audit.results.map(row => ({ ...row, detail: JSON.parse(row.detail) })), plans: plans.results });
 }
 

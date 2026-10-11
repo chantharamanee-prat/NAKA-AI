@@ -5,6 +5,7 @@ import { backfillReceipts, handleReceipts } from "./receipts";
 import { handleOnboarding } from "./onboarding";
 import { checkAdmin, supportMay } from "./admin/auth";
 import { handleAdminStaff } from "./admin/staff";
+import { handleCustomerTools } from "./admin/customer-tools";
 import { handleAdminCoupons } from "./billing/coupons";
 import { handleAdminCustomers } from "./admin/customers";
 import { handleWorks } from "./works";
@@ -163,6 +164,9 @@ export default {
       if (actor.role !== "owner" && !supportMay(request.method, url.pathname)) {
         return adminJson({ error: "บัญชีผู้ช่วยทำรายการนี้ไม่ได้ ติดต่อเจ้าของระบบ", reason: "role" }, 403);
       }
+      // notes, tags, CSV, bulk credits and PDPA export/erase for customers (src/admin/customer-tools.ts)
+      const toolResponse = await handleCustomerTools(request, env, url, actor);
+      if (toolResponse) return toolResponse;
       const staffResponse = await handleAdminStaff(request, env, url, actor);
       if (staffResponse) return staffResponse;
       const couponResponse = await handleAdminCoupons(request, env, url, actor);

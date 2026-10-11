@@ -30,7 +30,7 @@ function target(env: Env): { base: string; token: string } {
 }
 
 /** One call to the studio's /api/v1; answers its `data`, or throws a message the admin can act on. */
-export async function studio(env: Env, path: string, method: 'GET' | 'POST' = 'GET', timeoutMs = TIMEOUT_MS): Promise<unknown> {
+export async function studio(env: Env, path: string, method: 'GET' | 'POST' = 'GET', timeoutMs = TIMEOUT_MS, payload: unknown = {}): Promise<unknown> {
   const { base, token } = target(env);
   let response: Response;
   try {
@@ -39,7 +39,7 @@ export async function studio(env: Env, path: string, method: 'GET' | 'POST' = 'G
       // the token must never follow a redirect to another host
       redirect: 'error',
       headers: { 'X-Admin-Token': token, Accept: 'application/json', ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}) },
-      body: method === 'POST' ? '{}' : undefined,
+      body: method === 'POST' ? JSON.stringify(payload) : undefined,
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch {
