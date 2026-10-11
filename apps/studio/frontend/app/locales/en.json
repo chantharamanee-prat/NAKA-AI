@@ -99,6 +99,18 @@
       "effectRefresh": "The page refreshes automatically after confirming",
       "confirm": "Switch & Refresh",
       "refreshing": "Language switched, refreshing…"
+    },
+    "cinematic": {
+      "title": "Cinematic techniques",
+      "hint": "Pick up to one per group. They are added to the image and video prompts of every shot (camera movement and timing apply to video only).",
+      "none": "None",
+      "clear": "Clear all",
+      "loadError": "Could not load the techniques. Try refreshing the page.",
+      "shelf": "Cinematic techniques",
+      "shelfHint": "150 camera, lighting and composition techniques to use when creating a video",
+      "use": "Use in my next video",
+      "used": "Picked",
+      "pending": "{n} techniques will be used in the next video you create"
     }
   },
   "composables": {

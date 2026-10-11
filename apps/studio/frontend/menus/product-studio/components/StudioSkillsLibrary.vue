@@ -67,11 +67,43 @@
       </div>
     </section>
 
+    <!-- ===== Cinematic techniques (150, core/generation/cinematic-techniques.ts) ===== -->
+    <section v-if="showCinematic && filteredTechniques.length" class="sl-section" aria-labelledby="sl-cine-title">
+      <div class="sl-section-head">
+        <h2 id="sl-cine-title" class="sl-section-title">{{ t('components.cinematic.shelf') }} <span class="sl-count">{{ filteredTechniques.length }}</span></h2>
+        <p class="sl-section-desc">{{ t('components.cinematic.shelfHint') }}</p>
+      </div>
+      <div class="sl-chips sl-subchips" role="group" :aria-label="t('components.cinematic.title')">
+        <button type="button" :class="['sl-chip', { on: cineGroup === '' }]" :aria-pressed="cineGroup === ''" @click="cineGroup = ''">
+          {{ t('productStudio.library.all') }}
+        </button>
+        <button v-for="g in cineGroups" :key="g.id" type="button" :class="['sl-chip', { on: cineGroup === g.id }]"
+          :aria-pressed="cineGroup === g.id" @click="cineGroup = g.id">
+          {{ th ? g.nameTh : g.name }}
+        </button>
+      </div>
+      <p v-if="nextPicks.length" class="sl-next" role="status">
+        <span>{{ t('components.cinematic.pending', { n: nextPicks.length }) }}</span>
+        <button type="button" class="btn btn-sm" @click="emit('new-video')">{{ t('productStudio.create.title') }}</button>
+      </p>
+      <ul class="sl-cine-grid">
+        <li v-for="x in filteredTechniques" :key="x.id" :class="['sl-cine', { on: nextPicks.includes(x.id) }]">
+          <span class="sl-cine-group">{{ groupLabel(x.group) }}</span>
+          <b class="sl-cine-name">{{ th ? x.nameTh : x.name }}</b>
+          <span class="sl-cine-alt">{{ th ? x.name : x.nameTh }}</span>
+          <p class="sl-cine-desc">{{ th ? x.descriptionTh : x.description }}</p>
+          <button type="button" class="btn btn-sm" :aria-pressed="nextPicks.includes(x.id)" @click="toggleNext(x.id)">
+            {{ nextPicks.includes(x.id) ? t('components.cinematic.used') : t('components.cinematic.use') }}
+          </button>
+        </li>
+      </ul>
+    </section>
+
     <div v-if="loading && !templates.length" class="sl-grid" aria-hidden="true">
       <div v-for="i in 4" :key="i" class="sl-skeleton"></div>
     </div>
 
-    <div v-else-if="!filteredWorkflows.length && !filteredTemplates.length" class="sl-empty">
+    <div v-else-if="!filteredWorkflows.length && !filteredTemplates.length && !(showCinematic && filteredTechniques.length)" class="sl-empty">
       <SearchX :size="26" :stroke-width="1.5" />
       <p class="sl-empty-title">{{ t('productStudio.library.emptyTitle') }}</p>
       <p class="sl-empty-desc">{{ t('productStudio.library.emptyDesc') }}</p>
@@ -86,6 +118,8 @@ import { useI18n } from 'vue-i18n'
 import { menuArt, templateArt } from '~/utils/studioArt'
 import MenuHeroArt from '~/components/MenuHeroArt.vue'
 import { beatBars } from '../utils/studioFlow'
+import { useCinematicTechniques } from '~/composables/useCinematicTechniques'
+import { nextCinematic, pickNextCinematic, unpickNextCinematic } from '~/utils/cinematicNext'
 
 /**
  * StudioSkillsLibrary — หน้า "คลังสกิล" (แนว Skills Library): hero + ค้นหา + ชิปหมวด
@@ -96,8 +130,17 @@ const props = defineProps({
   templates: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
 })
-const emit = defineEmits(['use-template', 'go-tab'])
-const { t, te } = useI18n()
+const emit = defineEmits(['use-template', 'go-tab', 'new-video'])
+const { t, te, locale } = useI18n()
+
+// ----- cinematic techniques shelf: pick techniques for the next product video (its create dialog starts from them)
+const { groups: cineGroups, techniques, load: loadTechniques } = useCinematicTechniques()
+onMounted(loadTechniques)
+const th = computed(() => String(locale.value).startsWith('th'))
+const cineGroup = ref('')
+const nextPicks = ref(nextCinematic())
+const groupLabel = id => { const g = cineGroups.value.find(x => x.id === id); return g ? (th.value ? g.nameTh : g.name) : id }
+function toggleNext(id) { nextPicks.value = nextPicks.value.includes(id) ? unpickNextCinematic(id) : pickNextCinematic(id) }
 
 const query = ref('')
 const category = ref('all')
@@ -152,9 +195,16 @@ const filteredTemplates = computed(() => {
   return searchedTemplates.value.filter(tpl => tpl.category === category.value)
 })
 
+const searchedTechniques = computed(() => techniques.value.filter(x =>
+  matches(x.name, x.nameTh, x.description, x.descriptionTh, groupLabel(x.group))))
+const filteredTechniques = computed(() => searchedTechniques.value.filter(x => !cineGroup.value || x.group === cineGroup.value))
+// the techniques shelf shows under "all" only while searching (150 cards would bury the templates), and on its own chip
+const showCinematic = computed(() => category.value === 'cinematic' || (category.value === 'all' && !!q.value))
+
 const chips = computed(() => [
   { id: 'all', label: t('productStudio.library.all'), icon: LayoutGrid, count: searchedWorkflows.value.length + searchedTemplates.value.length },
   { id: 'workflow', label: t('productStudio.library.workflowChip'), icon: Workflow, count: searchedWorkflows.value.length },
+  { id: 'cinematic', label: t('components.cinematic.shelf'), icon: Clapperboard, count: searchedTechniques.value.length },
   ...templateCategories.value.map(c => ({
     id: c, label: categoryLabel(c), icon: CATEGORY_ICONS[c] || ShoppingBag,
     count: searchedTemplates.value.filter(tpl => tpl.category === c).length,
@@ -254,6 +304,28 @@ function useWorkflow(w) {
   animation: sl-pulse 1.4s ease-in-out infinite;
 }
 @keyframes sl-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* === Cinematic techniques shelf === */
+.sl-count { margin-left: 6px; font-size: 13px; font-weight: 700; color: var(--text-3); }
+.sl-subchips { margin-top: -4px; }
+.sl-next {
+  position: sticky; top: 8px; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 0; padding: 10px 14px; border-radius: var(--radius-lg);
+  border: 1px solid var(--accent); background: var(--surface-raised); color: var(--text-0); font-size: 13px; font-weight: 600;
+  box-shadow: var(--shadow-sm, 0 4px 14px rgba(0, 0, 0, .18));
+}
+.sl-cine-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin: 0; padding: 0; list-style: none; }
+.sl-cine {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  padding: 14px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--surface-raised);
+}
+.sl-cine.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.sl-cine-group { align-self: flex-start; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--bg-hover); color: var(--text-2); }
+.sl-cine-name { font-size: 15px; color: var(--text-0); }
+.sl-cine-alt { font-size: 12px; color: var(--text-3); }
+.sl-cine-desc { flex: 1; margin: 4px 0 8px; font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+.sl-cine .btn { align-self: flex-start; min-height: 40px; }
 
 /* === Empty === */
 .sl-empty {

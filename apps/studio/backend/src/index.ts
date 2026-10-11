@@ -17,6 +17,7 @@ import agent from './core/routes/agent.js'
 import skills from './core/routes/skills.js'
 import settings from './core/routes/settings.js'
 import system from './core/routes/system.js'
+import cinematic from './core/routes/cinematic.js'
 import { requestLogger, errorHandler } from './core/http/logger.js'
 import { adminGuard, assertAdminTokenConfig, guardOn, isAdminRequest } from './core/auth/admin.js'
 import nakaSso, { requireSession, ssoConfig, ssoEnabled } from './core/auth/naka-sso.js'
@@ -110,6 +111,7 @@ api.route('/skills', skills)
 api.route('/settings', settings)
 // version, disk use and video queues for the naka-ai back office (/admin/studio-system/), admins only
 api.route('/system', system)
+api.route('/cinematic-techniques', cinematic)
 // product menus (drama, marketer, product-studio, seller, viral-clone, live, social) — src/modules.ts
 for (const m of studioModules) m.mount(api)
 

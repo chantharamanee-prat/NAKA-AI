@@ -468,6 +468,8 @@ export interface StudioProject {
   sourceCampaignId: number | null
   status: StudioStatus; errorMsg: string | null
   dramaId: number | null; episodeId: number | null
+  // cinematic technique ids picked for every shot (backend core/generation/cinematic-techniques.ts)
+  cinematic?: string[]
   createdAt: string; updatedAt: string
 }
 export type AutoRenderStage = 'idle' | 'keyframes' | 'videos' | 'merging' | 'done' | 'failed' | 'cancelled'

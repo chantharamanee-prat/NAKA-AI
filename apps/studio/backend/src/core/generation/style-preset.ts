@@ -4,6 +4,7 @@
  */
 import { and, eq } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
+import { cinematicPrompt } from './cinematic-techniques.js'
 
 /** style value of a drama whose look the author typed in (drama page → Art Style → Custom) */
 export const CUSTOM_STYLE = 'custom'
@@ -29,4 +30,32 @@ export async function getDramaStylePrompt(dramaId: number | null | undefined): P
   const [preset] = await db.select().from(schema.stylePresets)
     .where(and(eq(schema.stylePresets.value, drama.style), eq(schema.stylePresets.isActive, true)))
   return preset?.prompt || ''
+}
+
+/**
+ * The cinematic techniques picked for a drama (cinematic-techniques.ts), as the "Cinematography:" line for a shot's
+ * image or video prompt. A drama keeps its picks in metadata.cinematic; a product video's hidden drama
+ * (metadata.studioProjectId) uses its project's studio_projects.cinematic. '' when nothing is picked.
+ */
+export async function getDramaCinematicPrompt(dramaId: number | null | undefined, kind: 'image' | 'video'): Promise<string> {
+  if (!dramaId) return ''
+  const [drama] = await db.select({ metadata: schema.dramas.metadata }).from(schema.dramas).where(eq(schema.dramas.id, dramaId))
+  let meta: any = null
+  try { meta = drama?.metadata ? JSON.parse(drama.metadata) : null } catch { /* not JSON: nothing picked */ }
+  let picks: unknown = meta?.cinematic
+  if (!Array.isArray(picks) && Number.isInteger(meta?.studioProjectId)) {
+    const [project] = await db.select({ cinematic: schema.studioProjects.cinematic }).from(schema.studioProjects)
+      .where(eq(schema.studioProjects.id, meta.studioProjectId))
+    try { picks = project?.cinematic ? JSON.parse(project.cinematic) : null } catch { picks = null }
+  }
+  return cinematicPrompt(picks, kind)
+}
+
+/** The drama a storyboard (shot) belongs to, through its episode; null when it has none. */
+export async function dramaIdOfStoryboard(storyboardId: number | null | undefined): Promise<number | null> {
+  if (!storyboardId) return null
+  const [row] = await db.select({ dramaId: schema.episodes.dramaId }).from(schema.storyboards)
+    .innerJoin(schema.episodes, eq(schema.episodes.id, schema.storyboards.episodeId))
+    .where(eq(schema.storyboards.id, storyboardId))
+  return row?.dramaId ?? null
 }

@@ -240,6 +240,8 @@
             </label>
           </div>
           <p v-if="audioQualityWarn" class="ps-warn-note" role="alert">{{ t('productStudio.settings.audioQualityWarn') }}</p>
+          <!-- cinematic techniques for every shot of this video (studio_projects.cinematic) -->
+          <CinematicPicker v-model="settingsDraft.cinematic" />
 
           <label class="field">
             <span class="field-label">{{ t('productStudio.settings.duration', { min: STUDIO_DURATION_MIN, max: durationMax }) }}</span>
@@ -589,6 +591,7 @@
 </template>
 
 <script setup lang="ts">
+import CinematicPicker from '~/components/CinematicPicker.vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
@@ -809,6 +812,7 @@ function resetSettings(d: StudioDetail) {
     captions: d.captions !== false,
     captionStyle: d.captionStyle || 'bold',
     aiLabelBurnIn: !!d.aiLabelBurnIn,
+    cinematic: Array.isArray(d.cinematic) ? [...d.cinematic] : [],
   }
 }
 const settingsDraft = ref({
@@ -816,6 +820,7 @@ const settingsDraft = ref({
   durationSec: 30, avatarId: null as number | null, influencerId: null as number | null,
   tone: '', notes: '', budgetThb: '', aiDisclosure: true,
   captions: true, captionStyle: 'bold' as 'clean' | 'bold' | 'boxed', aiLabelBurnIn: false,
+  cinematic: [] as string[],
 })
 const settingsSnapshot = ref('')
 const settingsDirty = computed(() => JSON.stringify(settingsDraft.value) !== settingsSnapshot.value)
@@ -934,6 +939,7 @@ async function saveSettings(silent = false): Promise<boolean> {
       captions: s.captions,
       captionStyle: s.captionStyle,
       aiLabelBurnIn: s.aiLabelBurnIn,
+      cinematic: s.cinematic,
     })
     detail.value = { ...detail.value, ...updated }
     resetSettings(detail.value!)

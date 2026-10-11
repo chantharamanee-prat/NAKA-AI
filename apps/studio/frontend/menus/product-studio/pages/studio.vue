@@ -40,6 +40,7 @@
       :loading="optionsLoading"
       @use-template="useTemplate"
       @go-tab="switchTab"
+      @new-video="switchTab('projects'); openCreate()"
     />
 
     <!-- ===== Projects ===== -->
@@ -214,6 +215,7 @@
                 </div>
                 <span v-if="createTemplate" class="field-hint">{{ t(`productStudio.templates.${projectForm.templateId}.description`) }}</span>
               </div>
+              <CinematicPicker v-model="projectForm.cinematic" />
             </template>
             <!-- avatars only: the influencer form below has its own fields -->
             <template v-else-if="tab === 'avatars'">
@@ -346,6 +348,8 @@
 </template>
 
 <script setup lang="ts">
+import { clearNextCinematic, nextCinematic } from '~/utils/cinematicNext'
+import CinematicPicker from '~/components/CinematicPicker.vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -414,7 +418,7 @@ function open(p: StudioProject) {
 // ===== create dialog (ใช้ร่วมสองแท็บ) =====
 const showCreate = ref(false)
 const creating = ref(false)
-const projectForm = ref({ productName: '', productUrl: '', templateId: '' })
+const projectForm = ref({ productName: '', productUrl: '', templateId: '', cinematic: [] as string[] })
 const avatarForm = ref({ name: '', description: '', locale: '', imageUrl: '' })
 const avatarFileEl = ref<HTMLInputElement | null>(null)
 const avatarUploading = ref(false)
@@ -432,7 +436,8 @@ const canCreate = computed(() => tab.value === 'avatars'
     : !!(projectForm.value.productName.trim() || projectForm.value.productUrl.trim()))
 
 function openCreate(templateId?: string) {
-  projectForm.value = { productName: '', productUrl: '', templateId: templateId || templates.value[0]?.id || '' }
+  // techniques picked on the skills library's เทคนิคภาพยนตร์ shelf start the next video
+  projectForm.value = { productName: '', productUrl: '', templateId: templateId || templates.value[0]?.id || '', cinematic: nextCinematic() }
   avatarForm.value = { name: '', description: '', locale: '', imageUrl: '' }
   influencerForm.value = { name: '', appearance: '', persona: '', niche: '', locale: '', imageUrl: '' }
   showCreate.value = true
@@ -505,7 +510,9 @@ async function create() {
         productName: projectForm.value.productName.trim() || projectForm.value.productUrl.trim(),
         productUrl: projectForm.value.productUrl.trim() || null,
         templateId: projectForm.value.templateId,
+        cinematic: projectForm.value.cinematic,
       })
+      clearNextCinematic()
       toast.success(t('productStudio.create.created'))
       navigateTo(`/studio/${p.id}`)
       return
