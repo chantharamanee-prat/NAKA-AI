@@ -99,7 +99,7 @@ test('sitemap.xml lists only public pages that exist, the home page in both lang
 });
 
 test('llms.txt tells AI assistants what naka-ai is, in the site\'s own words, with links that exist and no prices', () => {
-  const llms = read('llms.txt');
+  const llms = read('llms.txt').replace(/\r\n/g, '\n'); // a Windows checkout may turn LF into CRLF
   assert.match(llms, /^# naka-ai\n\n> แค่มีรูปสินค้า ก็ได้คลิปขาย/);
   for (const words of [/ทำคลิปขายของ/, /คลิปป้ายยา/, /ละครสั้น/, /ไลฟ์สด/, /พากย์เสียงไทย/, /TikTok Shop/, /Shopee/]) assert.match(llms, words);
   for (const [, url] of llms.matchAll(/\]\((https:\/\/naka-ai\.com[^)]*)\)/g)) {
