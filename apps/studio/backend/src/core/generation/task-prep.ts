@@ -5,7 +5,7 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
 import { getActiveConfig, getConfigById } from '../ai/ai.js'
-import { getDramaStylePrompt } from './style-preset.js'
+import { getDramaCinematicPrompt, getDramaStylePrompt } from './style-preset.js'
 import { storyboardReadiness } from '../production/storyboard-readiness.js'
 
 export type TaskType = 'image' | 'video'
@@ -150,8 +150,12 @@ export async function prepareVideoTask(body: any, context: Awaited<ReturnType<ty
   if (validationError) throw new Error(validationError)
   let prompt = String(videoBody.prompt || '')
   if (prompt.trim()) {
-    const stylePrompt = await getDramaStylePrompt(body.drama_id ?? context.storyboardDramaId ?? null)
+    const dramaId = body.drama_id ?? context.storyboardDramaId ?? null
+    const stylePrompt = await getDramaStylePrompt(dramaId)
     if (stylePrompt) prompt = `${stylePrompt}，\n${prompt}`
+    // the cinematic techniques picked for this drama or product video (cinematic-techniques.ts)
+    const cinematic = await getDramaCinematicPrompt(dramaId, 'video')
+    if (cinematic) prompt = `${prompt}\n${cinematic}`
   }
   return { videoBody, config, prompt }
 }

@@ -17,6 +17,7 @@ import { releaseFeatureUse, useVideoQuota } from '../auth/entitlements.js'
 import { holdTaskCredits, settleTaskCredits, taskCredits } from '../auth/credits.js'
 import { currentOwnerId } from '../auth/owner-context.js'
 import { sourceSnapshotForShot } from '../production/source-freshness.js'
+import { dramaIdOfStoryboard, getDramaCinematicPrompt } from './style-preset.js'
 
 type TaskType = 'image' | 'video'
 
@@ -130,13 +131,21 @@ export async function generateImage(params: GenerateImageParams): Promise<number
     : await getActiveConfig('image')
   if (!config) throw new AppError('未配置图片模型，请先到「设置」页添加并启用 AI 服务', 'E_NO_IMAGE_MODEL')
 
+  // a shot's frame gets the cinematic techniques picked for its drama; character, scene and prop references stay
+  // neutral so they can be reused in any shot (cinematic-techniques.ts)
+  let prompt = params.prompt
+  if (params.storyboardId && !params.characterId && !params.sceneId && !params.propId) {
+    const cinematic = await getDramaCinematicPrompt(params.dramaId ?? await dramaIdOfStoryboard(params.storyboardId), 'image')
+    if (cinematic) prompt = `${prompt}\n${cinematic}`
+  }
+
   const id = await createTask('image', config, {
     storyboardId: params.storyboardId,
     dramaId: params.dramaId,
     sceneId: params.sceneId,
     characterId: params.characterId,
     propId: params.propId,
-    prompt: params.prompt,
+    prompt,
     model: params.model || config.model,
   }, {
     size: params.size || '1920x1080',

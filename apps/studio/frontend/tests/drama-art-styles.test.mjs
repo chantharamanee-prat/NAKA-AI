@@ -31,7 +31,8 @@ test('Custom: typed description is required and saved as metadata.customStyle fr
 })
 
 test('project settings keep the custom description in the metadata they already merge', () => {
-  assert.match(detail, /'tropes', 'customStyle'\]/)
+  // the cinematic picks are saved in the same metadata (core/generation/cinematic-techniques.ts)
+  assert.match(detail, /'tropes', 'customStyle'(, 'cinematic')?\]/)
   assert.match(detail, /v-if="settingsForm\.style === 'custom'" v-model="positioningForm\.customStyle"/)
   assert.match(detail, /\{ label: styleName\('custom'\), value: 'custom' \}/)
 })
