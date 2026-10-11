@@ -138,3 +138,39 @@ Owners create codes on การเงิน → โค้ดส่วนลด.
   site content, alerts, staff, and the bot's legacy unaudited credit route.
 - **The menu** hides owner-only pages for support staff.
 - **Removing staff** takes effect at their next request.
+
+## Customer care tools (`src/admin/customer-tools.ts`, migration `0010_customer_tools.sql`)
+
+**Notes and tags (โน้ตและป้าย).**
+- Admins see them; the customer does not.
+- Tags appear in the customer list, and `?tag=` filters the list.
+- Support staff may add and remove both.
+
+**Customer CSV.** `GET /api/admin/customers.csv?q=&tag=` gives the list as a CSV with the same search,
+up to 20,000 rows. It uses the same Excel and formula safety as the payments CSV.
+
+**Bulk credits (owners only).** `POST /api/admin/customers/bulk-credits` takes either `{ userIds }` (the
+boxes picked in the list) or `{ tag }`, plus an amount and a reason.
+- Each customer gets their own audit row and their own `grant` in the ledger, all in one transaction.
+- The rows of one batch share a `bulk` id.
+- One request covers at most 1,000 customers. Unknown or closed accounts are refused.
+
+**PDPA (ข้อมูลส่วนบุคคล tab, owners only).**
+- **Export:** `POST /:id/export { note }` downloads everything about the customer as JSON.
+  - It covers their identities, packages, payments, receipts, credits, jobs, AI videos, uploads, pages,
+    posts, inbox, features, admin notes and admin history.
+  - It includes naka-studio's counts and latest works.
+  - It never includes password hashes, sessions or page tokens.
+  - The export is recorded in the customer's history (`export`).
+- **Erase:** `GET /:id/erase-preview` shows what goes and what stays. `POST /:id/erase { confirm: <id>, note }`
+  then erases.
+  1. **Studio first.** naka-studio's `POST /api/v1/system/erase-member` deletes every row the member made,
+     top-level and children (the studio has no foreign keys), in one statement, then their files under the
+     storage folder. If the studio cannot be reached, nothing here changes.
+  2. **naka-ai.** Identities, passwords, sessions, pages, posts, inbox, jobs, AI videos, uploads (and their
+     `MEDIA` files), features, notes, tags and the package are deleted.
+  3. **Kept for accounting and tax:** payments, receipts, the credit ledger and the admin history. The
+     account keeps its id, loses its name and is closed. A pending payment is expired.
+  4. **Record:** an `erase` entry lists what was removed and kept. A second erase is refused.
+- Customer data outside these systems is not covered, for example LINE chats with the shop bot (keyed by
+  LINE user id) or copies at Stripe.

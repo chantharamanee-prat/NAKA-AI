@@ -65,7 +65,9 @@ export async function checkAdmin(request: Request, env: Env): Promise<AdminCheck
 export function supportMay(method: string, path: string): boolean {
   if (path.startsWith('/api/admin/system/settings') || path.startsWith('/api/admin/staff') || path.startsWith('/api/admin/alerts')) return false;
   if (method === 'GET' || method === 'HEAD') return true;
+  // notes and tags too; exporting or erasing a customer's data and bulk credits stay with owners
   return /^\/api\/admin\/customers\/[^/]+\/(credits|status|password|feature)$/.test(path)
+    || /^\/api\/admin\/customers\/[^/]+\/(notes|tags)(\/[^/]+)?$/.test(path)
     || /^\/api\/admin\/studio-system\/tasks\/\d+\/cancel$/.test(path)
     || /^\/api\/admin\/(products|orders|conversations|chat|settings)(\/|$)/.test(path);
 }
