@@ -23,13 +23,6 @@
         <p>{{ t('social.serverOnlyHint', { reason: canConnect?.reason || '' }) }}</p>
       </div>
     </div>
-    <div v-else-if="!loading && !accounts.length && !pending.items.length" class="card sc-empty">
-      <MessagesSquare :size="22" :stroke-width="1.7" />
-      <div>
-        <h3>{{ t('social.accountsPage.empty') }}</h3>
-        <p>{{ t('social.accountsPage.emptyHint') }}</p>
-      </div>
-    </div>
     <div v-else>
     <section class="card sc-connect">
       <div>
@@ -58,6 +51,14 @@
       </div>
       <p v-if="pendingError" class="sc-error">{{ pendingError }}</p>
     </section>
+
+    <div v-if="!loading && !accounts.length && !pending.items.length" class="card sc-empty">
+      <MessagesSquare :size="22" :stroke-width="1.7" />
+      <div>
+        <h3>{{ t('social.accountsPage.empty') }}</h3>
+        <p>{{ t('social.accountsPage.emptyHint') }}</p>
+      </div>
+    </div>
 
     <div v-if="accounts.length" class="sc-grid">
       <section v-for="a in accounts" :key="a.id" class="card sc-card">

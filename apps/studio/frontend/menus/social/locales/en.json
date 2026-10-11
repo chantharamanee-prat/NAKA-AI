@@ -33,7 +33,7 @@
       "title": "Social accounts",
       "subtitle": "Settings for each Page",
       "empty": "No accounts yet",
-      "emptyHint": "Connect a Facebook Page to get started (coming in a later ticket)",
+      "emptyHint": "Press “Connect Facebook” above to pick the Pages you want to start with",
       "statusConnected": "Connected",
       "statusReconnect": "Reconnect needed",
       "replyMode": "Reply mode",
