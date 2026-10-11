@@ -88,6 +88,11 @@
       </p>
       <ul class="sl-cine-grid">
         <li v-for="x in filteredTechniques" :key="x.id" :class="['sl-cine', { on: nextPicks.includes(x.id) }]">
+          <button v-if="!artFailed[x.id]" type="button" class="sl-cine-art"
+            :aria-label="t('components.cinematic.view', { name: th ? x.nameTh : x.name })" @click="openView(x)">
+            <img :src="cinematicArt(x.id)" alt="" loading="lazy" decoding="async" width="480" height="274" @error="artFailed[x.id] = true">
+            <span v-if="isStrip(x)" class="sl-cine-strip">{{ t('components.cinematic.strip') }}</span>
+          </button>
           <span class="sl-cine-group">{{ groupLabel(x.group) }}</span>
           <b class="sl-cine-name">{{ th ? x.nameTh : x.name }}</b>
           <span class="sl-cine-alt">{{ th ? x.name : x.nameTh }}</span>
@@ -97,6 +102,23 @@
           </button>
         </li>
       </ul>
+      <!-- the example image, large: click a card's image; Esc, the close button or the backdrop closes it -->
+      <dialog ref="viewDialog" class="sl-cine-view" aria-labelledby="sl-cine-view-title" @close="viewing = null" @click.self="closeView">
+        <div v-if="viewing" class="sl-cine-view-body">
+          <img :src="cinematicArt(viewing.id)" :alt="th ? viewing.nameTh : viewing.name" width="1344" height="768">
+          <span class="sl-cine-group">{{ groupLabel(viewing.group) }}</span>
+          <h3 id="sl-cine-view-title" class="sl-cine-view-title">{{ th ? viewing.nameTh : viewing.name }}</h3>
+          <span class="sl-cine-alt">{{ th ? viewing.name : viewing.nameTh }}</span>
+          <p class="sl-cine-desc">{{ th ? viewing.descriptionTh : viewing.description }}</p>
+          <p v-if="isStrip(viewing)" class="sl-cine-note">{{ t('components.cinematic.stripHint') }}</p>
+          <div class="sl-cine-view-actions">
+            <button type="button" class="btn btn-ghost" @click="closeView">{{ t('common.close') }}</button>
+            <button type="button" class="btn btn-primary" :aria-pressed="nextPicks.includes(viewing.id)" @click="toggleNext(viewing.id)">
+              {{ nextPicks.includes(viewing.id) ? t('components.cinematic.used') : t('components.cinematic.use') }}
+            </button>
+          </div>
+        </div>
+      </dialog>
     </section>
 
     <div v-if="loading && !templates.length" class="sl-grid" aria-hidden="true">
@@ -115,7 +137,8 @@
 <script setup>
 import { Clapperboard, Copy, Eye, Heart, LayoutGrid, Lightbulb, Megaphone, Radio, Search, SearchX, Shirt, ShoppingBag, Sparkles, Store, UserRound, Workflow, X, Zap } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
-import { menuArt, templateArt } from '~/utils/studioArt'
+import { useRoute } from 'vue-router'
+import { cinematicArt, menuArt, templateArt } from '~/utils/studioArt'
 import MenuHeroArt from '~/components/MenuHeroArt.vue'
 import { beatBars } from '../utils/studioFlow'
 import { useCinematicTechniques } from '~/composables/useCinematicTechniques'
@@ -141,9 +164,18 @@ const cineGroup = ref('')
 const nextPicks = ref(nextCinematic())
 const groupLabel = id => { const g = cineGroups.value.find(x => x.id === id); return g ? (th.value ? g.nameTh : g.name) : id }
 function toggleNext(id) { nextPicks.value = nextPicks.value.includes(id) ? unpickNextCinematic(id) : pickNextCinematic(id) }
+// example images (public/studio-art/cinematic): a card whose image is missing keeps its text-only layout
+const artFailed = reactive({})
+// camera movement and timing cannot show in one still: their example is a strip of three frames
+const isStrip = x => cineGroups.value.find(g => g.id === x.group)?.image === false
+const viewing = ref(null)
+const viewDialog = ref(null)
+function openView(x) { viewing.value = x; viewDialog.value?.showModal() }
+function closeView() { viewDialog.value?.close() }
 
 const query = ref('')
-const category = ref('all')
+// ?shelf=cinematic opens the cinematic techniques (the shortcut in Settings → skill library → camera angles)
+const category = ref(useRoute().query.shelf === 'cinematic' ? 'cinematic' : 'all')
 
 const CATEGORY_ICONS = { review: Heart, demo: Lightbulb, fashion_beauty: Shirt, showcase: Eye, promo: Zap }
 
@@ -326,6 +358,29 @@ function useWorkflow(w) {
 .sl-cine-alt { font-size: 12px; color: var(--text-3); }
 .sl-cine-desc { flex: 1; margin: 4px 0 8px; font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
 .sl-cine .btn { align-self: flex-start; min-height: 40px; }
+.sl-cine-art {
+  position: relative; display: block; margin: -14px -14px 6px; padding: 0; border: 0; cursor: zoom-in;
+  aspect-ratio: 480 / 274; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--bg-hover);
+}
+.sl-cine-art img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .25s ease; }
+.sl-cine-art:hover img, .sl-cine-art:focus-visible img { transform: scale(1.04); }
+.sl-cine-art:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sl-cine-strip {
+  position: absolute; right: 8px; bottom: 8px; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; background: rgba(0, 0, 0, .66); color: #fff;
+}
+.sl-cine-view {
+  position: fixed; inset: 0; margin: auto; height: fit-content;
+  width: min(880px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; overflow: auto;
+  border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--surface-raised); color: var(--text-1);
+}
+.sl-cine-view::backdrop { background: rgba(0, 0, 0, .6); }
+.sl-cine-view-body { display: flex; flex-direction: column; gap: 4px; padding: 0 20px 20px; }
+.sl-cine-view-body > img { display: block; width: calc(100% + 40px); height: auto; margin: 0 -20px 12px; background: var(--bg-hover); }
+.sl-cine-view-title { margin: 4px 0 0; font-size: 20px; color: var(--text-0); }
+.sl-cine-note { margin: 0 0 8px; font-size: 12.5px; color: var(--text-3); }
+.sl-cine-view-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.sl-cine-view-actions .btn { min-height: 44px; }
 
 /* === Empty === */
 .sl-empty {

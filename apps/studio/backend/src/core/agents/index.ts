@@ -17,7 +17,9 @@ import { imagePromptTools } from './tools/image-prompt-tools.js'
 import { loadAgentSkills, skillWorkspaces } from './skills.js'
 import { loadAgentPromptFile, loadBasePromptFile } from './prompts.js'
 import { buildLanguageDirective, buildPacingDirective } from './language.js'
-import { getContentLanguageFromRC } from './context.js'
+import { getContentLanguageFromRC, getDramaId, getStudioProjectId } from './context.js'
+import { cinematicDirective } from '../generation/cinematic-techniques.js'
+import { getDramaCinematic, getProjectCinematic } from '../generation/style-preset.js'
 
 // Default prompts (used when workspace/prompts/<type>.md 文件缺失时兜底)
 export const DEFAULT_PROMPTS: Record<string, { name: string; instructions: string }> = {
@@ -730,10 +732,28 @@ function buildInstructions(type: string) {
     const skillInstructions = await loadAgentSkills(type, lang)
     // อัตราจังหวะเวลาต่อภาษา: ช่วยแก้กฎจีน (500字/分钟) สำหรับ storyboard/บทยาว — เฉพาะเอเจนต์ที่คำนวณความยาว
     const pacingDirective = type === 'storyboard_breaker' || type === 'script_rewriter' || type === 'ad_scriptwriter' ? buildPacingDirective(lang) : ''
+    const cinematic = await buildCinematicDirective(type, requestContext)
     const languageDirective = buildLanguageDirective(lang)
-    return [baseInstructions, skillInstructions, pacingDirective, languageDirective]
+    return [baseInstructions, skillInstructions, pacingDirective, cinematic, languageDirective]
       .filter(Boolean)
       .join('\n\n')
+  }
+}
+
+/** Agents that plan shots or write shot prompts: they are told the user's cinematic picks for the video. */
+export const CINEMATIC_AGENTS: ReadonlySet<string> = new Set(['storyboard_breaker', 'prompt_generator', 'review_director'])
+
+/** The cinematic picks of the drama or product video this request works on, as agent instructions; '' when none. */
+export async function buildCinematicDirective(type: string, requestContext?: RequestContext): Promise<string> {
+  if (!CINEMATIC_AGENTS.has(type)) return ''
+  try {
+    const dramaId = getDramaId(requestContext)
+    const ids = dramaId ? await getDramaCinematic(dramaId) : await getProjectCinematic(getStudioProjectId(requestContext))
+    return cinematicDirective(ids)
+  } catch (err) {
+    // picks are a nicety: an agent run must not fail because they could not be read
+    logTaskWarn('agent', `cinematic picks unavailable: ${(err as Error).message}`)
+    return ''
   }
 }
 

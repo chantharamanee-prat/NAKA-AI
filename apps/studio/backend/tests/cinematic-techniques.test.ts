@@ -13,7 +13,7 @@ process.env.DATABASE_URL = 'pglite://memory'
 process.env.NAKA_DATA_DIR = mkdtempSync(path.join(tmpdir(), 'naka-cine-'))
 const { Hono } = await import('hono')
 const { db, insertedId, schema, rawQuery } = await import('../src/core/db/index.js')
-const { CINEMATIC_GROUPS, CINEMATIC_TECHNIQUES, normalizeCinematic, cinematicPrompt } = await import('../src/core/generation/cinematic-techniques.js')
+const { CINEMATIC_GROUPS, CINEMATIC_PRESETS, CINEMATIC_TECHNIQUES, normalizeCinematic, cinematicPrompt, cinematicDirective } = await import('../src/core/generation/cinematic-techniques.js')
 const { getDramaCinematicPrompt, dramaIdOfStoryboard } = await import('../src/core/generation/style-preset.js')
 const { default: cinematicRoute } = await import('../src/core/routes/cinematic.js')
 const { default: dramas } = await import('../src/modules/drama/routes/dramas.js')
@@ -37,22 +37,61 @@ test('the catalogue: 150 techniques, unique ids, every group filled, Thai and En
   }
 })
 
-test('picks: unknown ids dropped, one per group, group order; movement and timing reach video only', () => {
+test('picks: unknown ids dropped, one per group, group order; movement and timing reach video only; framing is left to the planner', () => {
   assert.deepEqual(normalizeCinematic(['look.noir', 'nope', 'shot.close-up', 'shot.wide', 'movement.orbit', 7]), ['shot.close-up', 'movement.orbit', 'look.noir'])
   assert.deepEqual(normalizeCinematic('shot.wide'), [])
   const picks = ['shot.low-angle', 'movement.push-in', 'lighting.golden-hour', 'pacing.slow-motion']
   assert.equal(cinematicPrompt(picks, 'video'),
-    'Cinematography: low-angle shot looking up, subject appears powerful; slow push-in toward the subject; golden hour sunlight, warm and low; smooth slow motion')
-  assert.equal(cinematicPrompt(picks, 'image'), 'Cinematography: low-angle shot looking up, subject appears powerful; golden hour sunlight, warm and low')
+    'Cinematography: slow push-in toward the subject; golden hour sunlight, warm and low; smooth slow motion')
+  assert.equal(cinematicPrompt(picks, 'image'), 'Cinematography: golden hour sunlight, warm and low')
   assert.equal(cinematicPrompt(['movement.orbit'], 'image'), '')
+  assert.equal(cinematicPrompt(['shot.wide'], 'video'), '', 'a framing pick never forces every shot')
   assert.equal(cinematicPrompt([], 'video'), '')
 })
 
-test('GET /cinematic-techniques lists the groups and all 150 techniques', async () => {
+test('the shot planning agents are told the picks: framing as a default they vary, the rest not to be repeated', async () => {
+  const text = cinematicDirective(['shot.wide', 'lighting.moonlight', 'bogus'])
+  assert.match(text, /^## Cinematic techniques chosen by the user/)
+  assert.match(text, /- Shot size & angle: Wide shot \(/)
+  assert.match(text, /- Lighting: Moonlight \(/)
+  assert.match(text, /Framing: "Wide shot" is the default\./)
+  assert.match(text, /do not repeat it/)
+  assert.doesNotMatch(cinematicDirective(['shot.wide']), /do not repeat it/)
+  assert.doesNotMatch(cinematicDirective(['lighting.moonlight']), /Framing:/)
+  assert.equal(cinematicDirective([]), '')
+
+  // the agent registry reads them for the request's drama, or its product video
+  const { buildCinematicDirective } = await import('../src/core/agents/index.js')
+  const { buildAgentRequestContext, buildStudioRequestContext } = await import('../src/core/agents/context.js')
+  const projectId = insertedId(await db.insert(schema.studioProjects).values({ title: 'โคมไฟ', templateId: 'ugc_review',
+    cinematic: JSON.stringify(['lighting.moonlight']), createdAt: ts(), updatedAt: ts() } as any).returning({ id: schema.studioProjects.id }))
+  const dramaId = insertedId(await db.insert(schema.dramas).values({ title: 'ละครคืนจันทร์', metadata: JSON.stringify({ cinematic: ['shot.wide'] }),
+    createdAt: ts(), updatedAt: ts() }).returning({ id: schema.dramas.id }))
+  assert.match(await buildCinematicDirective('storyboard_breaker', buildAgentRequestContext({ dramaId, episodeId: 1 })), /Wide shot/)
+  assert.match(await buildCinematicDirective('review_director', buildStudioRequestContext({ studioProjectId: projectId })), /Moonlight/)
+  assert.equal(await buildCinematicDirective('script_rewriter', buildAgentRequestContext({ dramaId, episodeId: 1 })), '', 'only shot planners')
+  assert.equal(await buildCinematicDirective('storyboard_breaker', undefined), '')
+})
+
+test('GET /cinematic-techniques lists the groups, all 150 techniques and the presets', async () => {
   const res = await app.request('/api/v1/cinematic-techniques')
   assert.equal(res.status, 200)
   const { data } = await res.json() as any
   assert.equal(data.techniques.length, 150); assert.equal(data.groups.length, 7)
+  assert.equal(data.presets.length, CINEMATIC_PRESETS.length)
+})
+
+test('presets: known techniques, one per group, at least four groups, Thai and English, no dashes', () => {
+  assert.equal(CINEMATIC_PRESETS.length, 8)
+  assert.equal(new Set(CINEMATIC_PRESETS.map(p => p.id)).size, 8)
+  for (const p of CINEMATIC_PRESETS) {
+    assert.match(p.id, /^[a-z]+$/, 'a plain id: the example image is studio-art/cinematic/preset.<id>.webp')
+    assert.deepEqual(normalizeCinematic(p.picks), p.picks, `${p.id}: picks are known, one per group, in group order`)
+    assert.ok(p.picks.length >= 4, `${p.id} sets at least four groups`)
+    for (const field of ['name', 'nameTh', 'description', 'descriptionTh'] as const) assert.ok(p[field].trim(), `${p.id}.${field}`)
+    assert.match(p.nameTh + p.descriptionTh, /[฀-๿]/)
+    assert.doesNotMatch(JSON.stringify(p), /[–—]/)
+  }
 })
 
 test('a drama keeps its picks in metadata.cinematic (the rest of the metadata untouched); its shots get the line', async () => {
@@ -63,7 +102,7 @@ test('a drama keeps its picks in metadata.cinematic (the rest of the metadata un
   assert.equal(res.status, 200)
   const [row] = await db.select().from(schema.dramas).where((await import('drizzle-orm')).eq(schema.dramas.id, dramaId))
   assert.deepEqual(JSON.parse(row.metadata!), { customStyle: 'ink wash', cinematic: ['shot.dutch', 'lighting.neon'] })
-  assert.equal(await getDramaCinematicPrompt(dramaId, 'image'), 'Cinematography: Dutch angle, camera tilted about 20 degrees; neon signs lighting the scene, saturated colors')
+  assert.equal(await getDramaCinematicPrompt(dramaId, 'image'), 'Cinematography: neon signs lighting the scene, saturated colors')
 
   const episodeId = insertedId(await db.insert(schema.episodes).values({ dramaId, episodeNumber: 1, title: 'ตอน 1', createdAt: ts(), updatedAt: ts() } as any)
     .returning({ id: schema.episodes.id }))

@@ -14,17 +14,27 @@ const studio = read('menus/product-studio/pages/studio.vue')
 const workspace = read('menus/product-studio/views/workspace.vue')
 const library = read('menus/product-studio/components/StudioSkillsLibrary.vue')
 
-test('the picker: one choice per group, emitted as technique ids', () => {
+test('the picker: one choice per group by example picture, emitted as technique ids, "let the AI choose" first', () => {
   assert.match(picker, /useCinematicTechniques/)
   assert.match(picker, /props\.modelValue\.filter\(v => byId\.value\.get\(v\)\?\.group !== group\)/, 'choosing replaces the same group')
-  assert.match(picker, /components\.cinematic\.none/)
+  assert.match(picker, /@click="choose\(g\.id, ''\)"[\s\S]*components\.cinematic\.auto/)
+  assert.match(picker, /:src="cinematicArt\(x\.id\)"[^>]*@error="artFailed\[x\.id\] = true"/)
+  assert.match(picker, /:aria-expanded="custom"/, 'the per-group pictures sit behind "customize"')
+})
+
+test('the picker leads with moods: a preset fills the picks, tapping it again clears them', () => {
+  assert.match(picker, /v-for="p in presets"/)
+  assert.match(picker, /emit\('update:modelValue', activePreset\.value === p\.id \? \[\] : \[\.\.\.p\.picks\]\)/)
+  assert.match(picker, /:aria-pressed="activePreset === p\.id"/)
+  assert.match(picker, /cinematicArt\('preset\.' \+ p\.id\)/)
+  assert.match(read('app/composables/useCinematicTechniques.js'), /presets\.value = data\.presets/)
 })
 
 test('menu pages import the picker (menus are Nuxt layers: shared components are not auto-registered there)', () => {
   for (const [name, src] of [['detail', detail], ['studio', studio], ['workspace', workspace]]) {
     assert.match(src, /import CinematicPicker from '~\/components\/CinematicPicker\.vue'/, name)
   }
-  assert.match(picker, /import BaseSelect from '~\/components\/BaseSelect\.vue'/)
+  assert.match(picker, /import \{ cinematicArt \} from '~\/utils\/studioArt'/)
   assert.match(picker, /import \{ useI18n \} from 'vue-i18n'/, 'no auto-imports here: without it the picker never renders')
 })
 
@@ -46,8 +56,29 @@ test('the skills library has a shelf of the techniques with group chips and a pi
   assert.match(studio, /@new-video="switchTab\('projects'\); openCreate\(\)"/)
 })
 
+test('shelf cards show the example image, open it large, and keep the text card when the image is missing', () => {
+  assert.match(library, /<img :src="cinematicArt\(x\.id\)" alt="" loading="lazy"[^>]*@error="artFailed\[x\.id\] = true">/)
+  assert.match(library, /v-if="!artFailed\[x\.id\]"/)
+  assert.match(library, /@click="openView\(x\)"/)
+  assert.match(library, /<dialog ref="viewDialog" class="sl-cine-view" aria-labelledby="sl-cine-view-title"/)
+  assert.match(library, /@click="toggleNext\(viewing\.id\)"/, 'pick from the large view too')
+  assert.match(library, /import \{ cinematicArt, /)
+})
+
+test('Settings → skill library → camera angles points to the techniques, which open on their shelf', () => {
+  const settings = read('app/pages/settings.vue')
+  assert.match(settings, /<NuxtLink to="\/studio\?tab=skills&shelf=cinematic"/)
+  assert.match(settings, /\['all', 'cinematography'\]\.includes\(libraryCategory\.value\)/)
+  assert.match(library, /useRoute\(\)\.query\.shelf === 'cinematic' \? 'cinematic' : 'all'/)
+  for (const lang of ['th', 'en']) {
+    const s = JSON.parse(read(`app/locales/${lang}.json`)).settings.skills
+    for (const k of ['cinematicTitle', 'cinematicDesc', 'cinematicOpen']) assert.ok(s[k], `${lang}: settings.skills.${k}`)
+  }
+})
+
 test('both languages have every cinematic text', () => {
-  const keys = ['title', 'hint', 'none', 'clear', 'loadError', 'shelf', 'shelfHint', 'use', 'used', 'pending']
+  const keys = ['title', 'hint', 'moods', 'picked', 'custom', 'customHide', 'customHint', 'auto', 'clear', 'loadError',
+    'shelf', 'shelfHint', 'use', 'used', 'pending', 'view', 'strip', 'stripHint']
   for (const lang of ['th', 'en']) {
     const texts = JSON.parse(read(`app/locales/${lang}.json`)).components.cinematic
     for (const k of keys) assert.ok(texts[k], `${lang}: components.cinematic.${k}`)
