@@ -15,6 +15,7 @@ import { DATA_ROOT } from '../utils/paths.js'
 import { rawQuery } from '../db/index.js'
 import { dirUsage, volumeFreeBytes } from '../utils/dirsize.js'
 import { badRequest, success } from '../http/response.js'
+import { countMember, eraseMember } from '../admin/erase-member.js'
 
 const app = new Hono()
 
@@ -215,6 +216,21 @@ app.get('/member-works', async (c) => {
       path: WORK_PATHS[String(r.kind)] + Number(r.id),
     })),
   })
+})
+
+// ---------- a member's data on request (PDPA), from the landing's /admin/customers/ ----------
+// GET counts what would go; POST erases it. Admin only like the rest of /system; the landing calls with ADMIN_TOKEN.
+const OWNER = /^[^\s'"\\]{1,128}$/
+app.get('/member-data', async (c) => {
+  const owner = c.req.query('owner') ?? ''
+  if (!OWNER.test(owner) || owner === 'local') return badRequest(c, 'owner is required')
+  return success(c, await countMember(owner))
+})
+app.post('/erase-member', async (c) => {
+  const body = await c.req.json().catch(() => ({})) as { owner?: unknown }
+  const owner = typeof body.owner === 'string' ? body.owner : ''
+  if (!OWNER.test(owner) || owner === 'local') return badRequest(c, 'owner is required')
+  return success(c, await eraseMember(owner))
 })
 
 export default app

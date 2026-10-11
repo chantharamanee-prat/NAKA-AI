@@ -56,6 +56,10 @@
     if (!response.ok) { var error = new Error(typeof result.error === 'string' ? result.error : 'โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่'); error.status = response.status; throw error; }
     return result;
   }
+  /** tell customer-tools.js what is shown; never in the way of this page (no CustomEvent: nothing to tell) */
+  function announce(name, detail) {
+    if (typeof CustomEvent === 'function' && typeof document.dispatchEvent === 'function') document.dispatchEvent(new CustomEvent(name, { detail: detail }));
+  }
   function usableError(error) { return error.message !== 'signed-out' && error.message !== 'stale'; }
   function lock(value) {
     busy = value;
@@ -79,17 +83,24 @@
     var version = ++listVersion;
     message('list-status', 'กำลังค้นหาลูกค้า…'); $('customer-list').replaceChildren();
     try {
-      var result = await api('?q=' + encodeURIComponent($('query').value.trim()));
+      var result = await api('?q=' + encodeURIComponent($('query').value.trim()) + '&tag=' + encodeURIComponent($('tag-filter').value.trim()));
       if (version !== listVersion) return;
       result.customers.forEach(function (row) {
         var tr = el('tr', null, 'customer-row' + (row.id === selectedId ? ' selected' : '')); tr.dataset.userId = row.id;
+        // a box to pick customers for bulk credits (customer-tools.js); picking never opens the customer
+        var pick = el('td', null, 'pick'), box = el('input'); box.type = 'checkbox'; box.value = row.id;
+        box.setAttribute('aria-label', 'เลือก ' + (row.name || row.id));
+        pick.addEventListener('click', function (event) { event.stopPropagation(); });
+        pick.append(box);
         var cell = el('td'), button = el('button', row.name || 'ไม่มีชื่อ'); button.type = 'button';
         button.setAttribute('aria-label', 'ดูรายละเอียด ' + (row.name || row.id));
         cell.append(button, el('small', row.phone || row.email || row.id));
-        tr.append(cell, el('td', label(row.status)), el('td', label(row.planId)), el('td', num(row.credits), 'num'));
+        if (row.tags && row.tags.length) { var chips = el('span', null, 'row-tags'); row.tags.forEach(function (t) { chips.append(el('span', t, 'chip')); }); cell.append(chips); }
+        tr.append(pick, cell, el('td', label(row.status)), el('td', label(row.planId)), el('td', num(row.credits), 'num'));
         tr.addEventListener('click', function () { if (!busy) openCustomer(row.id, true).catch(function () {}); });
         $('customer-list').append(tr);
       });
+      announce('naka:customers', result.customers);
       message('list-status', result.customers.length ? 'แสดง ' + result.customers.length + ' คน · สูงสุด 50 คน เรียงจากสมัครล่าสุด' : 'ไม่พบลูกค้าที่ตรงกับคำค้น');
     } catch (error) { if (version === listVersion && usableError(error)) message('list-status', error.status ? error.message : 'เชื่อมต่อไม่ได้ กดค้นหาเพื่อลองอีกครั้ง', true); throw error; }
   }
@@ -101,7 +112,7 @@
       ['สมัครเมื่อ', date(customer.createdAt)], ['เครดิตคงเหลือ', num(customer.credits)], ['แพ็กเกจที่ใช้งาน', label(customer.planId)]]);
     var sub = data.subscription;
     summary('subscription-summary', sub ? [['แพ็กเกจ', sub.planName], ['สถานะ', sub.expiresAt && sub.expiresAt <= Date.now() / 1000 ? 'หมดอายุ' : label(sub.status)],
-      ['ใช้ได้ถึง', sub.expiresAt == null ? 'ไม่มีกำหนด' : date(sub.expiresAt)], ['รอบ', label(sub.period)], ['เติมเครดิตรอบถัดไป', date(sub.nextCreditAt)]] : [['แพ็กเกจ', 'ฟรี — ยังไม่มีการสมัครแพ็กเกจ']]);
+      ['ใช้ได้ถึง', sub.expiresAt == null ? 'ไม่มีกำหนด' : date(sub.expiresAt)], ['รอบ', label(sub.period)], ['เติมเครดิตรอบถัดไป', date(sub.nextCreditAt)]] : [['แพ็กเกจ', 'ฟรี · ยังไม่มีการสมัครแพ็กเกจ']]);
     $('plan').replaceChildren(); plans.forEach(function (plan) { var option = el('option', plan.name + ' · ' + num(plan.monthlyCredits) + ' เครดิต/เดือน'); option.value = plan.id; $('plan').append(option); });
     if (plans.some(function (p) { return p.id === customer.planId; })) $('plan').value = customer.planId;
     $('package-review').disabled = !plans.length;
@@ -148,6 +159,7 @@
       }); table.append(tbody); disclosure.append(el('summary', 'ดูค่าก่อนและหลัง'), table, el('p', 'รหัสบันทึก ' + row.id, 'muted')); item.append(disclosure);
     });
     $('detail').hidden = false;
+    announce('naka:customer', data); // notes, tags and PDPA (customer-tools.js)
   }
   async function openCustomer(id, focus) {
     if (busy) return;
@@ -228,7 +240,7 @@
   $('cancel').addEventListener('click', cancel);
   $('reload-detail').addEventListener('click', function () { if (selectedId) openCustomer(selectedId, false).catch(function () {}); });
   $('search-form').addEventListener('submit', function (event) { event.preventDefault(); if (!busy) loadCustomers().catch(function () {}); });
-  $('reset-search').addEventListener('click', function () { if (busy) return; $('query').value = ''; loadCustomers().catch(function () {}); });
+  $('reset-search').addEventListener('click', function () { if (busy) return; $('query').value = ''; $('tag-filter').value = ''; loadCustomers().catch(function () {}); });
   $('logout').addEventListener('click', function () {
     if (busy) return;
     login(); fetch('/api/auth/logout', { method: 'POST' }).catch(function () {});
