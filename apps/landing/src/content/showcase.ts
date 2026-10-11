@@ -52,7 +52,7 @@ export function parseGallery(html: string): { start: number; end: number; cards:
     const n = (seen.get(key) ?? 0) + 1;
     seen.set(key, n);
     if (n > 1) key += '#' + n;
-    const title = /<h3>([\s\S]*?)<\/h3>/.exec(card)?.[1] ?? label ?? '';
+    const title = /<strong class="g-title">([\s\S]*?)<\/strong>/.exec(card)?.[1] ?? label ?? '';
     cards.push({ id: 'static:' + key, category: /data-cat="(\w+)"/.exec(card)?.[1] ?? '', title: unescape(title.replace(/<[^>]+>/g, '')).trim(),
       poster: /poster="([^"]+)"/.exec(card)?.[1] ?? null, video: !!src, html: card, index: cards.length });
     end = m.index + card.length;
@@ -72,7 +72,7 @@ function uploadedCard(row: ClipRow): string {
           <video data-autoplay muted loop playsinline preload="none" poster="/showcase-media/${row.poster_key}" aria-hidden="true"><source src="/showcase-media/${row.video_key}" type="video/mp4"></video>
           <span class="g-chip">${escape(row.chip || card.chip)}</span>
           <button class="reel-sound" type="button" aria-pressed="false" aria-label="เปิดเสียงคลิป ${title}"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16.5 9.5l5 5m0-5l-5 5"/></svg></button>
-          <div class="g-cap"><h3>${title}</h3>${row.subtitle ? `<p>${escape(row.subtitle)}</p>` : ''}<a class="g-use" href="${card.href}">${card.cta}</a></div>
+          <div class="g-cap"><strong class="g-title">${title}</strong>${row.subtitle ? `<p>${escape(row.subtitle)}</p>` : ''}<a class="g-use" href="${card.href}">${card.cta}</a></div>
         </article>`;
 }
 
