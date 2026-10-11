@@ -70,6 +70,14 @@ test('English home: its own title, description and one H1; every local file it u
   assert.match(en, /data-ready/, 'all 12 clips show without gallery.js');
 });
 
+test('clip titles in the gallery are plain text, so the headings outline the page and not 80 clip names', () => {
+  for (const html of [th, en]) {
+    assert.doesNotMatch(html, /class="g-cap"><h3>/);
+    assert.ok((html.match(/<strong class="g-title">/g) || []).length >= 12);
+    assert.ok((html.match(/<h3[\s>]/g) || []).length <= 15, 'only section-level h3s remain');
+  }
+});
+
 test('the home page no longer preloads the removed soap image; preloads point at real files', () => {
   assert.doesNotMatch(th, /soap-640/);
   for (const html of [th, en]) {

@@ -169,7 +169,7 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
 .g-from img { display: block; width: 100%; height: auto; border: 2px solid #fff; border-radius: 8px; }
 .g-from figcaption { margin-top: 4px; padding: 2px 3px; border-radius: 5px; background: rgba(255, 255, 255, .94); color: var(--ink); font-size: 10px; font-weight: 700; text-align: center; }
 .g-cap { padding: 14px; }
-.g-cap h3 { font-size: 16px; line-height: 1.35; letter-spacing: -.01em; }
+.g-cap .g-title { display: block; font-family: var(--u-display); font-weight: 600; font-size: 16px; line-height: 1.35; letter-spacing: -.01em; }
 .g-cap p { margin: 3px 0 0; font-size: 12.5px; line-height: 1.5; color: #c9d3e6; }
 .g-use { display: inline-flex; align-items: center; min-height: 36px; margin-top: 10px; padding: 0 14px; border-radius: 999px; background: #fff; color: var(--ink); font-size: 13px; font-weight: 700; }
 .g-use::after { content: ""; position: absolute; inset: 0; z-index: 1; }
@@ -266,7 +266,7 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
   .g-gallery:not([data-ready]) .g-grid > .g-card:nth-child(n+7) { display: none; }
   .g-card { border-radius: 16px; }
   .g-cap { padding: 10px; }
-  .g-cap h3 { font-size: 14px; }
+  .g-cap .g-title { font-size: 14px; }
   .g-cap p { display: none; }
   .g-use { min-height: 32px; margin-top: 8px; padding: 0 12px; font-size: 12px; }
   .g-from { top: 52px; right: 10px; width: 42px; }
