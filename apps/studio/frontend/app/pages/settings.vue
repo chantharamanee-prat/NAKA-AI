@@ -409,6 +409,18 @@
                 <div class="skills-empty-title">{{ t('settings.skills.libraryEmpty') }}</div>
               </div>
               <div v-else class="skills-library-grid">
+                <!-- the 150 cinematic techniques are picked per video by members, not installed for every project: a way there -->
+                <article v-if="showCinematicShortcut" class="card skills-library-card skills-library-cine">
+                  <div v-if="!libraryArtFailed.cinematic" class="skills-library-art" aria-hidden="true">
+                    <img :src="cinematicArt('preset.tearjerker')" alt="" loading="lazy" decoding="async" @error="libraryArtFailed.cinematic = true">
+                  </div>
+                  <div class="skills-library-card-head">
+                    <span class="skills-library-category">{{ t('settings.skills.categories.cinematography') }}</span>
+                  </div>
+                  <h3>{{ t('settings.skills.cinematicTitle') }}</h3>
+                  <p>{{ t('settings.skills.cinematicDesc') }}</p>
+                  <NuxtLink to="/studio?tab=skills&shelf=cinematic" class="btn btn-sm btn-primary">{{ t('settings.skills.cinematicOpen') }}</NuxtLink>
+                </article>
                 <article v-for="item in filteredLibrary" :key="item.id" class="card skills-library-card">
                   <div v-if="skillArt(item.id) && !libraryArtFailed[item.id]" class="skills-library-art" aria-hidden="true">
                     <img :src="skillArt(item.id).still" alt="" loading="lazy" decoding="async" @error="libraryArtFailed[item.id] = true">
@@ -674,7 +686,7 @@ import { Plus, Pencil, Trash2, FileText, ChevronDown, Check, Loader2, Bot, Cpu, 
 import BaseSelect from '~/components/BaseSelect.vue'
 import { toast } from 'vue-sonner'
 import { UNSLOTH_PROVIDER, UNSLOTH_VIDEO_DEFAULTS, isLocalOrPrivateBaseUrl } from '~/utils/unslothFlow'
-import { coverArt, skillArt, styleExample } from '~/utils/studioArt'
+import { cinematicArt, coverArt, skillArt, styleExample } from '~/utils/studioArt'
 import { galleryNumber, styleDisplayName } from '~/utils/styleName'
 import { toastError } from '~/composables/useToast'
 import { useI18n } from 'vue-i18n'
@@ -1121,6 +1133,10 @@ const currentSkills = computed(() =>
 )
 const libraryForAgent = computed(() => skillLibrary.value.filter(item => libraryAgent.value === 'all' || item.agent === libraryAgent.value))
 const libraryCategories = computed(() => ['all', ...new Set(libraryForAgent.value.map(item => item.category))])
+// camera-angle skills: also point to the cinematic techniques members pick per video (product studio skills library)
+const showCinematicShortcut = computed(() => !librarySearch.value.trim()
+  && ['all', 'cinematography'].includes(libraryCategory.value)
+  && ['all', 'storyboard_breaker', 'prompt_generator'].includes(libraryAgent.value))
 const filteredLibrary = computed(() => {
   const query = librarySearch.value.trim().toLocaleLowerCase()
   return libraryForAgent.value.filter(item =>

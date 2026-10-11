@@ -202,6 +202,47 @@ export const CINEMATIC_TECHNIQUES: CinematicTechnique[] = [
   ]),
 ]
 
+export interface CinematicPreset {
+  id: string
+  name: string
+  nameTh: string
+  description: string
+  descriptionTh: string
+  /** technique ids, at most one per group; some groups are left to the AI */
+  picks: string[]
+}
+
+/**
+ * Ready-made moods for members who do not speak camera: one tap picks a set of techniques that work together.
+ * Picking a preset only fills the picks, so a member can still change any group afterwards.
+ */
+export const CINEMATIC_PRESETS: CinematicPreset[] = [
+  { id: 'tearjerker', name: 'Tearjerker drama', nameTh: 'ดราม่าน้ำตา', description: 'Close on the face, soft window light, cool tones, slow moments.',
+    descriptionTh: 'เน้นใบหน้าใกล้ ๆ แสงนุ่มจากหน้าต่าง โทนเย็น จังหวะช้าให้อินกับอารมณ์',
+    picks: ['shot.close-up', 'movement.push-in', 'lighting.window', 'composition.negative-space', 'lens.portrait-85', 'look.cool-moody', 'pacing.slow-motion'] },
+  { id: 'romance', name: 'Sweet romance', nameTh: 'โรแมนติกหวาน', description: 'Golden light, dreamy background blur and warm film colors.',
+    descriptionTh: 'แสงทองยามเย็น ฉากหลังละลายฟุ้ง สีอุ่นแบบฟิล์ม กล้องหมุนรอบคู่พระนาง',
+    picks: ['shot.medium-close', 'movement.orbit', 'lighting.golden-hour', 'composition.foreground', 'lens.bokeh', 'look.warm-film', 'pacing.slow-motion'] },
+  { id: 'horror', name: 'Horror', nameTh: 'สยองขวัญ', description: 'Tilted frames, shaky camera and light from below.',
+    descriptionTh: 'มุมกล้องเอียง กล้องสั่นแบบถือมือ แสงส่องจากด้านล่าง สีหม่น',
+    picks: ['shot.dutch', 'movement.handheld', 'lighting.under-light', 'composition.negative-space', 'lens.wide-24', 'look.bleach-bypass'] },
+  { id: 'action', name: 'Action', nameTh: 'แอ็กชันมันส์', description: 'Low heroic angles, fast tracking and speed ramps.',
+    descriptionTh: 'มุมต่ำให้ดูทรงพลัง กล้องวิ่งตาม ภาพเร่งแล้วช้าตรงจังหวะเด็ด สีส้มฟ้าแบบหนังฮอลลีวูด',
+    picks: ['shot.low-angle', 'movement.tracking', 'lighting.hard-sun', 'composition.diagonal', 'lens.wide-24', 'look.teal-orange', 'pacing.speed-ramp'] },
+  { id: 'period', name: 'Period drama', nameTh: 'ละครย้อนยุค', description: 'Wide symmetrical frames, candlelight and soft vintage film.',
+    descriptionTh: 'ภาพกว้างสมมาตร แสงเทียน เลนส์และเม็ดฟิล์มแบบหนังเก่า',
+    picks: ['shot.wide', 'movement.crane-down', 'lighting.candle', 'composition.symmetry', 'lens.vintage-glass', 'look.35mm-grain'] },
+  { id: 'comedy', name: 'Bright comedy', nameTh: 'คอมเมดี้สดใส', description: 'Bright even light, centered frames and punchy colors on the beat.',
+    descriptionTh: 'แสงสว่างทั่วทั้งฉาก ตัวละครอยู่กลางภาพ สีสดใส ขยับตามจังหวะ',
+    picks: ['shot.medium', 'movement.static', 'lighting.high-key', 'composition.center', 'lens.normal-35', 'look.vibrant', 'pacing.beat-hit'] },
+  { id: 'thriller', name: 'Mystery thriller', nameTh: 'ลึกลับระทึก', description: 'Deep shadows, peeking through frames, a dizzying dolly zoom.',
+    descriptionTh: 'เงามืดลึก มองผ่านกรอบประตูเหมือนแอบดู ภาพบีบด้วยเลนส์ยาว ช็อตเวียนหัวตอนเฉลย',
+    picks: ['shot.over-shoulder', 'movement.dolly-zoom', 'lighting.low-key', 'composition.frame-in-frame', 'lens.tele-135', 'look.high-contrast'] },
+  { id: 'product', name: 'Product showcase', nameTh: 'โชว์สินค้า', description: 'The product big and sharp, turning slowly in clean studio light.',
+    descriptionTh: 'สินค้าเด่นชัดเต็มตา หมุนโชว์รอบทิศ แสงสตูดิโอสะอาด สีตรงจริง',
+    picks: ['shot.detail-insert', 'movement.product-turn', 'lighting.softbox-product', 'composition.product-hero', 'lens.macro', 'look.clean-commercial'] },
+]
+
 const BY_ID = new Map(CINEMATIC_TECHNIQUES.map(t => [t.id, t]))
 
 /** Only known ids, at most one per group, in group order. */

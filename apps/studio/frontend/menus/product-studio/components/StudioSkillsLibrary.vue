@@ -137,6 +137,7 @@
 <script setup>
 import { Clapperboard, Copy, Eye, Heart, LayoutGrid, Lightbulb, Megaphone, Radio, Search, SearchX, Shirt, ShoppingBag, Sparkles, Store, UserRound, Workflow, X, Zap } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import { cinematicArt, menuArt, templateArt } from '~/utils/studioArt'
 import MenuHeroArt from '~/components/MenuHeroArt.vue'
 import { beatBars } from '../utils/studioFlow'
@@ -173,7 +174,8 @@ function openView(x) { viewing.value = x; viewDialog.value?.showModal() }
 function closeView() { viewDialog.value?.close() }
 
 const query = ref('')
-const category = ref('all')
+// ?shelf=cinematic opens the cinematic techniques (the shortcut in Settings → skill library → camera angles)
+const category = ref(useRoute().query.shelf === 'cinematic' ? 'cinematic' : 'all')
 
 const CATEGORY_ICONS = { review: Heart, demo: Lightbulb, fashion_beauty: Shirt, showcase: Eye, promo: Zap }
 

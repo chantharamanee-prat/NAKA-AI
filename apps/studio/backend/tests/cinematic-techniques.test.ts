@@ -13,7 +13,7 @@ process.env.DATABASE_URL = 'pglite://memory'
 process.env.NAKA_DATA_DIR = mkdtempSync(path.join(tmpdir(), 'naka-cine-'))
 const { Hono } = await import('hono')
 const { db, insertedId, schema, rawQuery } = await import('../src/core/db/index.js')
-const { CINEMATIC_GROUPS, CINEMATIC_TECHNIQUES, normalizeCinematic, cinematicPrompt, cinematicDirective } = await import('../src/core/generation/cinematic-techniques.js')
+const { CINEMATIC_GROUPS, CINEMATIC_PRESETS, CINEMATIC_TECHNIQUES, normalizeCinematic, cinematicPrompt, cinematicDirective } = await import('../src/core/generation/cinematic-techniques.js')
 const { getDramaCinematicPrompt, dramaIdOfStoryboard } = await import('../src/core/generation/style-preset.js')
 const { default: cinematicRoute } = await import('../src/core/routes/cinematic.js')
 const { default: dramas } = await import('../src/modules/drama/routes/dramas.js')
@@ -73,11 +73,25 @@ test('the shot planning agents are told the picks: framing as a default they var
   assert.equal(await buildCinematicDirective('storyboard_breaker', undefined), '')
 })
 
-test('GET /cinematic-techniques lists the groups and all 150 techniques', async () => {
+test('GET /cinematic-techniques lists the groups, all 150 techniques and the presets', async () => {
   const res = await app.request('/api/v1/cinematic-techniques')
   assert.equal(res.status, 200)
   const { data } = await res.json() as any
   assert.equal(data.techniques.length, 150); assert.equal(data.groups.length, 7)
+  assert.equal(data.presets.length, CINEMATIC_PRESETS.length)
+})
+
+test('presets: known techniques, one per group, at least four groups, Thai and English, no dashes', () => {
+  assert.equal(CINEMATIC_PRESETS.length, 8)
+  assert.equal(new Set(CINEMATIC_PRESETS.map(p => p.id)).size, 8)
+  for (const p of CINEMATIC_PRESETS) {
+    assert.match(p.id, /^[a-z]+$/, 'a plain id: the example image is studio-art/cinematic/preset.<id>.webp')
+    assert.deepEqual(normalizeCinematic(p.picks), p.picks, `${p.id}: picks are known, one per group, in group order`)
+    assert.ok(p.picks.length >= 4, `${p.id} sets at least four groups`)
+    for (const field of ['name', 'nameTh', 'description', 'descriptionTh'] as const) assert.ok(p[field].trim(), `${p.id}.${field}`)
+    assert.match(p.nameTh + p.descriptionTh, /[฀-๿]/)
+    assert.doesNotMatch(JSON.stringify(p), /[–—]/)
+  }
 })
 
 test('a drama keeps its picks in metadata.cinematic (the rest of the metadata untouched); its shots get the line', async () => {
