@@ -34,6 +34,8 @@ export interface Env {
   META_APP_SECRET?: string;
   SOCIAL_TOKEN_KEY?: string; // base64 32-byte AES-GCM key for stored page tokens
   MEDIA?: R2Bucket; // clip uploads for posting; bound once the R2 bucket exists
+  // process, disks and backups of the Node server (server/server-info.ts); absent on Cloudflare
+  SERVER_INFO?: () => Promise<unknown>;
   // AI Inbox (Phase 4) — contract in docs/phase4-inbox.md
   META_WEBHOOK_VERIFY_TOKEN?: string;
   // Online payment (Stripe Checkout) — src/billing

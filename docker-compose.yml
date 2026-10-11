@@ -45,6 +45,7 @@ services:
       # the back office's "ระบบ Studio" page reads the studio over this network; STUDIO_ADMIN_TOKEN (= the
       # studio's ADMIN_TOKEN) goes in apps/landing/.env.production or /admin/system/
       STUDIO_INTERNAL_URL: http://studio:5679
+      BACKUP_DIR: /data/backups
       TZ: Asia/Bangkok
     # the Worker's vars and secrets (APP_ORIGIN, SESSION_SECRET, ADMIN_TOKEN, …) — see apps/landing/.env.example
     env_file:
@@ -52,6 +53,8 @@ services:
         required: false
     volumes:
       - landing-media:/data/media
+      # the back office shows the latest backup (สถานะเซิร์ฟเวอร์); read only
+      - pg-backups:/data/backups:ro
     # behind Caddy / Cloudflare Tunnel in production (ADR-0002); local port for testing
     ports:
       - "127.0.0.1:8788:8788"
@@ -82,8 +85,30 @@ services:
       - "127.0.0.1:5679:5679"
     restart: unless-stopped
 
+  # a pg_dump of the whole database every BACKUP_EVERY_HOURS hours, kept BACKUP_KEEP_DAYS days (infra/backup/backup.sh).
+  # Copy the pg-backups volume off this machine as well: a backup on the same disk does not survive the disk.
+  backup:
+    image: postgres:17-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-naka_admin}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATABASE: naka
+      BACKUP_EVERY_HOURS: ${BACKUP_EVERY_HOURS:-24}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      TZ: Asia/Bangkok
+    volumes:
+      - pg-backups:/backups
+      - ./infra/backup/backup.sh:/backup.sh:ro
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    restart: unless-stopped
+
 volumes:
   pgdata:
+  pg-backups:
   landing-media:
   # the volume apps/studio/docker-compose.yml used (project naka-drama-studio): kept by name so existing
   # media and workspace edits carry over; compose creates it on a fresh host

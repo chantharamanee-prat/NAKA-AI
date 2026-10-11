@@ -6,6 +6,8 @@ import { handleOnboarding } from "./onboarding";
 import { checkAdmin, supportMay } from "./admin/auth";
 import { handleAdminStaff } from "./admin/staff";
 import { handleCustomerTools } from "./admin/customer-tools";
+import { handleReports } from "./admin/reports";
+import { beat, handleServerStatus } from "./admin/server-status";
 import { handleAdminCoupons } from "./billing/coupons";
 import { handleAdminCustomers } from "./admin/customers";
 import { handleWorks } from "./works";
@@ -167,6 +169,11 @@ export default {
       // notes, tags, CSV, bulk credits and PDPA export/erase for customers (src/admin/customer-tools.ts)
       const toolResponse = await handleCustomerTools(request, env, url, actor);
       if (toolResponse) return toolResponse;
+      // business reports and this server's health (src/admin/reports.ts, src/admin/server-status.ts)
+      const reportResponse = await handleReports(request, env, url);
+      if (reportResponse) return reportResponse;
+      const serverResponse = await handleServerStatus(request, env, url);
+      if (serverResponse) return serverResponse;
       const staffResponse = await handleAdminStaff(request, env, url, actor);
       if (staffResponse) return staffResponse;
       const couponResponse = await handleAdminCoupons(request, env, url, actor);
@@ -208,6 +215,8 @@ export default {
   // Cron (wrangler.jsonc): drain the AI job queue once a minute, a few jobs at a time.
   async scheduled(controller, workerEnv, ctx): Promise<void> {
     const env = await withSettings(workerEnv);
+    // the back office's สถานะเซิร์ฟเวอร์ page tells a stopped cron from a quiet one (src/admin/server-status.ts)
+    ctx.waitUntil(beat(env, "cron").catch(() => console.error("heartbeat failed")));
     ctx.waitUntil(runQueue(env.DB, jobHandlers(env), { maxJobs: 30, concurrency: 5 }).then(
       (result) => { if (result.ran || result.recovered) console.log("queue", result); },
       (err) => console.error("queue run failed", errorSummary(err)),
