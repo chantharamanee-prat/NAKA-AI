@@ -71,7 +71,7 @@ export const SETTINGS: readonly SettingDef[] = [
   { key: 'STUDIO_URL', group: 'studio', kind: 'text', label: 'ที่อยู่ naka-studio', help: 'เช่น https://studio.naka-ai.com · ว่าง = ปิดการเชื่อมต่อ', max: 200,
     pattern: /^https:\/\/[a-z0-9.-]+(?::\d{2,5})?\/?$/i },
   { key: 'STUDIO_ACCESS', group: 'studio', kind: 'select', label: 'ใครเข้า naka-studio ได้',
-    help: 'admins = เฉพาะอีเมลผู้ดูแล (แนะนำจนกว่า studio จะแยกข้อมูลรายบัญชี) · members = สมาชิกทุกคน · off = ปิด', options: ['admins', 'members', 'off'] },
+    help: 'members = สมาชิกทุกคน (studio แยกข้อมูลรายบัญชีแล้ว และเมนูเปิดตามแพ็กเกจ) · admins = เฉพาะอีเมลผู้ดูแล ใช้ตอนทดสอบ · off = ปิด', options: ['admins', 'members', 'off'] },
   { key: 'STUDIO_SSO_SECRET', group: 'studio', kind: 'secret', label: 'รหัสลับเชื่อม naka-studio',
     help: 'ค่าเดียวกับ NAKA_SSO_SECRET ของ naka-studio · อย่างน้อย 32 ตัวอักษร', pattern: /^[A-Za-z0-9_-]{32,128}$/ },
   // the back office's "ระบบ Studio" page reads naka-studio server to server (src/admin/studio-system.ts)
