@@ -45,6 +45,11 @@ test('main menu: every module except the Skills Library; AI Seller is the app ho
   for (const need of ['sh-hero', 'v-model="query"', 'sh-chip', '<StudioSkillCard', '@use="useSkill(tpl)"', 'studioAPI.templates()']) {
     assert.ok(home.includes(need), `seller home missing ${need}`)
   }
+  // สร้างโพสต์เริ่มจากสินค้า + รูป/วิดีโอที่ถ่ายไว้ ลิงก์ affiliate อยู่ขั้นรายละเอียด
+  assert.match(home, /uploadAPI\.image/)
+  assert.match(home, /uploadAPI\.video/)
+  assert.match(home, /form\.productImages/)
+  assert.match(workspace, /seller\.steps\.details/)
 })
 
 test('menu, route and workspace wiring', () => {

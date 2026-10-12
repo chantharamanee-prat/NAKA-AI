@@ -202,11 +202,16 @@ function patchFrom(body: Record<string, unknown>) {
 
 export async function createPost(body: Record<string, unknown>) {
   const patch = patchFrom(body)
-  if (!patch.productName && !patch.productUrl) throw new AppError('ใส่ชื่อสินค้าหรือลิงก์สินค้าอย่างน้อยหนึ่งอย่าง', 'E_SELLER_NEEDS_PRODUCT')
+  const images = parseJson<string[]>(typeof patch.productImages === 'string' ? patch.productImages : '[]', [])
+  // เริ่มจากชื่อสินค้า หรือรูป/วิดีโอที่ถ่ายไว้ก่อนได้ — ลิงก์ affiliate และรายละเอียดใส่ทีหลัง
+  if (!patch.productName && !patch.productUrl && !images.length && !patch.videoUrl) {
+    throw new AppError('ใส่ชื่อสินค้า รูป หรือวิดีโออย่างน้อยหนึ่งอย่าง', 'E_SELLER_NEEDS_PRODUCT')
+  }
   const ts = now()
   const res = await db.insert(schema.sellerPosts).values({
     channels: JSON.stringify(SELLER_CHANNELS),
     ...patch,
+    productName: patch.productName || '',
     title: patch.title || patch.productName || '',
     createdAt: ts,
     updatedAt: ts,

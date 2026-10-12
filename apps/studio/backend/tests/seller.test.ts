@@ -61,6 +61,12 @@ test('create/update validation', async () => {
   assert.deepEqual(upd!.channels, ['tiktok', 'instagram'])
   assert.equal(upd!.productPrice, '199 บาท')
   assert.equal(await seller.updatePost(99999, {}), null)
+  const mediaOnly = await seller.createPost({ productImages: ['/static/products/b.png'], videoUrl: '/static/clips/b.mp4' })
+  assert.equal(mediaOnly!.productName, '')
+  assert.equal(mediaOnly!.title, '')
+  assert.equal(mediaOnly!.affiliateUrl, null)
+  assert.deepEqual(mediaOnly!.productImages, ['/static/products/b.png'])
+  assert.equal(mediaOnly!.videoUrl, '/static/clips/b.mp4')
 })
 
 test('AI copy per channel: hashtags cleaned + capped, link appended by backend, retry on bad JSON', async () => {
