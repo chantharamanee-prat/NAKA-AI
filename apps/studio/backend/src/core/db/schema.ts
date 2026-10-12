@@ -518,6 +518,8 @@ export const studioProjects = pgTable('studio_projects', {
   aiLabelBurnIn: boolean('ai_label_burn_in').default(false),
   autoRender: text('auto_render'),
   sourceCampaignId: bigint('source_campaign_id', { mode: 'number' }),
+  // cinematic techniques picked for this video: JSON array of ids (core/generation/cinematic-techniques.ts)
+  cinematic: text('cinematic'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   deletedAt: text('deleted_at'),

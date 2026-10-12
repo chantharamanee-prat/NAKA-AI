@@ -99,6 +99,26 @@
       "effectRefresh": "The page refreshes automatically after confirming",
       "confirm": "Switch & Refresh",
       "refreshing": "Language switched, refreshing…"
+    },
+    "cinematic": {
+      "title": "Cinematic techniques",
+      "hint": "Optional: skip it and the AI decides. Or tap a mood and the camera, light and colors that suit it are picked for you.",
+      "moods": "Mood of the story",
+      "picked": "Picked:",
+      "custom": "Customize (pick from example pictures)",
+      "customHide": "Hide customize",
+      "customHint": "Pick up to one per group by tapping a picture. The AI plans the shots around your picks: the shot size is the default and can still change where the story needs it. Camera movement and timing apply to video only.",
+      "auto": "Let the AI choose",
+      "clear": "Clear all",
+      "loadError": "Could not load the techniques. Try refreshing the page.",
+      "shelf": "Cinematic techniques",
+      "shelfHint": "150 camera, lighting and composition techniques to use when creating a video",
+      "use": "Use in my next video",
+      "used": "Picked",
+      "pending": "{n} techniques will be used in the next video you create",
+      "view": "View the example of {name}",
+      "strip": "3 frames",
+      "stripHint": "Camera movement and timing cannot show in one still, so the example is three frames read from left to right."
     }
   },
   "composables": {
@@ -583,6 +603,9 @@
       "install": "Add skill",
       "installed": "Added",
       "installedToast": "Added {name}",
+      "cinematicTitle": "150 cinematic techniques",
+      "cinematicDesc": "Nothing to install: members pick them for each drama or video when they create it, with example pictures and ready-made moods such as tearjerker, romance and horror.",
+      "cinematicOpen": "Open cinematic techniques",
       "categories": {
         "all": "All",
         "story": "Story",

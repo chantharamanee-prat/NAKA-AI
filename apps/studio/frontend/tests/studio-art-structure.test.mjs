@@ -73,3 +73,18 @@ test('every seeded visual style has an example image, and the picker falls back 
   assert.match(index, /v-if="styleImg\[p\.value\] !== 'ok'" class="style-glyph"/)
   assert.doesNotMatch(index, /overflow-x: auto; scroll-snap-type: x mandatory/)
 })
+
+test('every cinematic technique has its example image', async () => {
+  const { cinematicArt } = await import('../app/utils/studioArt.js')
+  const src = read('../backend/src/core/generation/cinematic-techniques.ts')
+  const ids = []
+  for (const [, group, body] of src.matchAll(/^ {2}\.\.\.rows\('([a-z]+)', \[([\s\S]*?)^ {2}\]\),/gm)) {
+    for (const [, slug] of body.matchAll(/^\s+\['([a-z0-9-]+)',/gm)) ids.push(`${group}.${slug}`)
+  }
+  assert.equal(ids.length, 150)
+  const presetSrc = src.slice(src.indexOf('export const CINEMATIC_PRESETS'))
+  const presets = [...presetSrc.matchAll(/^ {2}\{ id: '([a-z]+)', name:/gm)].map(m => `preset.${m[1]}`)
+  assert.equal(presets.length, 8, 'the mood presets have a picture each too')
+  for (const id of [...ids, ...presets]) assert.ok(existsSync(publicFile(cinematicArt(id))), `missing ${cinematicArt(id)}`)
+  assert.equal(cinematicArt('../etc/passwd'), '')
+})

@@ -34,6 +34,7 @@ import fs from 'fs'
 import path from 'path'
 import { v4 as uuid } from 'uuid'
 import { logTaskError, logTaskStart, logTaskSuccess } from '../../../core/tasks/task-logger.js'
+import { normalizeCinematic } from '../../../core/generation/cinematic-techniques.js'
 // registers review_director's save_studio_shots tool
 import '../agent-tools.js'
 
@@ -100,6 +101,7 @@ export function toProjectJson(row: ProjectRow) {
     platform: row.platform,
     aspectRatio: row.aspectRatio,
     durationSec: row.durationSec,
+    cinematic: parseJsonArray(row.cinematic ?? null),
     avatarId: row.avatarId,
     influencerId: row.influencerId,
     tone: row.tone,
@@ -395,6 +397,8 @@ export async function createProject(body: any) {
     aspectRatio,
     durationSec,
     aiDisclosure: body.aiDisclosure === undefined ? true : !!body.aiDisclosure,
+    // cinematic techniques for every shot (core/generation/cinematic-techniques.ts)
+    cinematic: body.cinematic === undefined ? null : JSON.stringify(normalizeCinematic(body.cinematic)),
     status: 'draft',
     createdAt: ts,
     updatedAt: ts,
@@ -455,6 +459,7 @@ export async function updateProject(id: number, body: any) {
     }
   }
   if (body.aspectRatio !== undefined) updates.aspectRatio = requireEnum<StudioAspectRatio>(body.aspectRatio, ['9:16', '1:1', '16:9'] as const, 'aspectRatio')
+  if (body.cinematic !== undefined) updates.cinematic = JSON.stringify(normalizeCinematic(body.cinematic))
   if (body.durationSec !== undefined) {
     const platform = (updates.platform ?? row.platform) as StudioPlatform
     const max = STUDIO_PLATFORMS.find(p => p.id === platform)!.maxDurationSec

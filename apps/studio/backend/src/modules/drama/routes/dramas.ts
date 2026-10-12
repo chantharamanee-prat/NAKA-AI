@@ -5,6 +5,7 @@ import { db, insertedId, schema } from '../../../core/db/index.js'
 import { success, badRequest, notFound, created, now } from '../../../core/http/response.js'
 import { toSnakeCase, toSnakeCaseArray } from '../../../core/utils/transform.js'
 import { budgetForDrama } from '../../../core/generation/generation-cost.js'
+import { normalizeCinematic } from '../../../core/generation/cinematic-techniques.js'
 
 const app = new Hono()
 
@@ -156,9 +157,21 @@ app.put('/:id', async (c) => {
   if (body.tags !== undefined) updates.tags = JSON.stringify(body.tags)
   if (body.metadata !== undefined) {
     // 允许直接传对象；字符串按原文存（由调用方保证可解析）
-    updates.metadata = typeof body.metadata === 'object' && body.metadata !== null
-      ? JSON.stringify(body.metadata)
-      : body.metadata
+    const meta = typeof body.metadata === 'object' && body.metadata !== null ? { ...body.metadata } : null
+    // the drama settings form saves its cinematic picks inside metadata: keep only known ids, one per group
+    if (meta && 'cinematic' in meta) meta.cinematic = normalizeCinematic(meta.cinematic)
+    updates.metadata = meta ? JSON.stringify(meta) : body.metadata
+  }
+  // cinematic techniques for this drama's shots (core/generation/cinematic-techniques.ts): kept in metadata.cinematic,
+  // only known ids and at most one per group; the rest of the metadata is left as it is
+  if (body.cinematic !== undefined) {
+    let meta: any = {}
+    if (updates.metadata !== undefined) meta = parseMetadata(updates.metadata) ?? {}
+    else {
+      const [current] = await db.select({ metadata: schema.dramas.metadata }).from(schema.dramas).where(eq(schema.dramas.id, id))
+      meta = parseMetadata(current?.metadata ?? null) ?? {}
+    }
+    updates.metadata = JSON.stringify({ ...meta, cinematic: normalizeCinematic(body.cinematic) })
   }
   if ('budget_thb' in body) {
     const raw = body.budget_thb

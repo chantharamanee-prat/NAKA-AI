@@ -70,6 +70,8 @@
               <span class="field-hint">{{ t('index.createDialog.aspectRatioHint') }}</span>
             </label>
           </div>
+          <!-- cinematic techniques for every shot of this drama (kept in metadata.cinematic) -->
+          <CinematicPicker v-model="positioningForm.cinematic" />
           <label class="field">
             <span class="field-label">{{ t('productionGuard.projectBudget') }}</span>
             <input v-model="settingsForm.budget_thb" class="input" type="number" min="0" max="100000000" step="0.01" inputmode="decimal" :placeholder="t('productionGuard.noBudget')" />
@@ -745,6 +747,7 @@ import { api, dramaAPI, episodeAPI, characterAPI, sceneAPI, propAPI, uploadAPI, 
 import { styleDisplayName } from '~/utils/styleName'
 import { GENRE_TAGS, BACKGROUND_TAGS, TROPE_TAGS } from '~/composables/useCreativeTags'
 import BaseSelect from '~/components/BaseSelect.vue'
+import CinematicPicker from '~/components/CinematicPicker.vue'
 
 // 项目工作区全屏显示（与剧集工作台同为 studio 布局，参考 Topview 项目页）
 definePageMeta({ layout: 'studio' })
@@ -961,8 +964,9 @@ const positioningForm = reactive({
   backgrounds: [],
   tropes: [],
   customStyle: '',
+  cinematic: [],
 })
-const METADATA_KEYS = ['episode_mode', 'first_episode_duration', 'episode_duration', 'suggestiveness', 'auto_review', 'auto_pipeline', 'genres', 'backgrounds', 'tropes', 'customStyle']
+const METADATA_KEYS = ['episode_mode', 'first_episode_duration', 'episode_duration', 'suggestiveness', 'auto_review', 'auto_pipeline', 'genres', 'backgrounds', 'tropes', 'customStyle', 'cinematic']
 function metadataFromForm() {
   return Object.fromEntries(METADATA_KEYS.map(k => [k, positioningForm[k]]))
 }
@@ -1024,6 +1028,7 @@ function fillPositioning() {
   positioningForm.backgrounds = [...(Array.isArray(m.backgrounds) ? m.backgrounds : [])]
   positioningForm.tropes = [...(Array.isArray(m.tropes) ? m.tropes : [])]
   positioningForm.customStyle = typeof m.customStyle === 'string' ? m.customStyle : ''
+  positioningForm.cinematic = Array.isArray(m.cinematic) ? [...m.cinematic] : []
   positioningSnapshot.value = JSON.stringify(metadataFromForm())
 }
 
