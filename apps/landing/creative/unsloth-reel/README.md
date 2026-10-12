@@ -1,13 +1,13 @@
 # Naka Reel: AI clips from Unsloth (MiniMax H3)
 
-The clip library under the hero (`#reel` in `public/index.html`) is one dark grid of 9:16 clips with a tab per product (รีวิว, ละครสั้น, AI Live, แชทบอท) and a "ดูอีก N คลิป" button, run by `public/gallery.js`. Each clip is rendered from a single still image by MiniMax H3 running in Unsloth Studio. H3 generates the Thai voice together with the picture. The cards play muted. The speaker button turns on sound for one clip at a time, and "จากรูปนี้" shows the exact first frame that was sent.
+The clip library under the hero (`#reel` in `public/index.html`) is one section per studio menu with clips (คลังสกิล, สตูดิโอละคร, AI Live) plus the chat bot: the menu's real name, what it makes and the button that opens it, then a grid of 9:16 clips that shows two rows and opens two more with "ดูอีก N คลิป" (`public/rails.js`, no sideways scrolling). The studio menus with no clips yet (โคลนไวรัล, AI นักขาย, นักการตลาด AI, Social) follow as cards tagged "ภาพประกอบ". Admins hide, order and upload clips in `/admin/content/`; `src/content/showcase.ts` refills each grid from the cards written here. Each clip is rendered from a single still image by MiniMax H3 running in Unsloth Studio. H3 generates the Thai voice together with the picture. The cards play muted. The speaker button turns on sound for one clip at a time, and "จากรูปนี้" shows the exact first frame that was sent.
 
 | File | Role |
 |---|---|
-| `shots.json` | Shot list (prompt, first frame, fixed seed, card text) plus filler clips used until 6 H3 clips exist. `"row"` (review, drama, live or bot) picks the tab; without it the tab comes from `href`. `"row": "app"` shots are in-app mascot animations and stay off the landing |
-| `chat-cards.html` | Written chat examples shown as cards in the live and bot tabs |
+| `shots.json` | Shot list (prompt, first frame, fixed seed, card text) plus filler clips used until 6 H3 clips exist. `"row"` (review, drama, live or bot) picks the row; without it the row comes from `href`. `"row": "app"` shots are in-app mascot animations and stay off the landing |
+| `chat-cards.html` | Written chat examples shown as cards in the AI Live and chat bot rows |
 | `generate.cjs` | Renders the shots one at a time on the Unsloth server and encodes them to `public/showcase/h3/` |
-| `build-reel.cjs` | Writes the library between `<!-- reel:start -->` and `<!-- reel:end -->` (generate runs it after every clip). Product clips lead each tab, clips starring Naka follow |
+| `build-reel.cjs` | Writes the library between `<!-- reel:start -->` and `<!-- reel:end -->` (generate runs it after every clip). Product clips lead each row, clips starring Naka follow; the Naka-only clips close the review row |
 
 ## Setup
 

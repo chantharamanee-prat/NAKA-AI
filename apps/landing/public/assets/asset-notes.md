@@ -87,3 +87,25 @@ blank speech bubbles (bot). The sales card keeps its video artwork.
 ## ../showcase/h3/<id>.mp4, <id>.jpg, <id>-from.jpg
 
 Clips for the "Naka Reel" band. Each is rendered with MiniMax H3 (fl2va) on Unsloth Studio from the first frame in `creative/unsloth-reel/shots.json`, then encoded to 540 × 960 H.264 with AAC so the Thai audio H3 generates is kept. `<id>.jpg` is the poster and `<id>-from.jpg` is the exact 9:16 first frame sent to the model, shown as "จากรูปนี้". Regenerate with `node creative/unsloth-reel/generate.cjs` (see the README there). Until clips exist, the band falls back to the demo and drama clips.
+
+## showcase/reel/sky-reel.mp4 and sky-reel.jpg
+
+15 s, 1280 x 720 web copy (H.264 + AAC, faststart) of the "ฟ้าหลังฝน" reel, shown in the home hero's dialog (`public/hero-reel.js`); nothing loads until the visitor presses play. Source is `creative/sky-reel/` (HyperFrames, Apache-2.0): `DESIGN.md` has the concept and beat timeline, `scripts/generate-audio.mjs` writes the score with Node built-ins only. The Thai iced tea photo is the first frame of the library's real "ชาไทยเย็น" clip and the phones show posters of real library clips; the end card says "ตัวอย่างสาธิต · คลิปในมือถือทำด้วยนาคา". Re-render and re-encode (needs Node, Chrome and ffmpeg):
+
+```sh
+cd creative/sky-reel && node scripts/generate-audio.mjs && npx hyperframes@0.8.145 render --fps 60 --quality delivery --output out/reel.mp4
+ffmpeg -i out/reel.mp4 -vf scale=1280:720:flags=lanczos -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -movflags +faststart ../../public/showcase/reel/sky-reel.mp4
+ffmpeg -ss 9.6 -i out/reel.mp4 -frames:v 1 -vf scale=1280:720:flags=lanczos -q:v 4 ../../public/showcase/reel/sky-reel.jpg
+```
+
+## platforms.svg
+
+SVG sprite of the six sales channels a clip goes to (Facebook, TikTok, Instagram, X, Shopee, Lazada), used by the hero row and the "ก่อนเริ่ม" section of both home pages through `<use href="/assets/platforms.svg#<id>">`. Facebook, TikTok, Instagram, X and Shopee come from Simple Icons 16.35.0 (CC0 1.0) in their brand colours (TikTok and X in the site ink). Simple Icons has no Lazada mark, so Lazada is the Arcticons icon by Donnnno (CC BY-SA 4.0, https://github.com/Arcticons-Team/Arcticons) drawn in Lazada navy; the credit is also in the file. The marks belong to their owners and only name where a clip can be posted.
+
+## showcase/menu/mascot-*.mp4 (+ .jpg posters)
+
+240 x 240 square crops (540 x 540 from y 210, the whole character) of four in-app Naka animations from `showcase/h3/`: anim-writing, anim-voice, anim-rendering and anim-done, muted H.264, about 100 KB each. `public/hero-line.js` puts them on the hero machine as a round screen that runs the studio's steps in turn (กำลังเขียนบท, กำลังพากย์เสียง, กำลังทำคลิป, เสร็จแล้ว!), one whole clip each, after the first 1.2 s and never on save-data or 2g; reduced motion keeps the still plush. Regenerate one with:
+
+```sh
+ffmpeg -i showcase/h3/anim-<step>.mp4 -vf "crop=540:540:0:210,scale=240:240:flags=lanczos" -an -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -g 24 -movflags +faststart showcase/menu/mascot-<step>.mp4
+```

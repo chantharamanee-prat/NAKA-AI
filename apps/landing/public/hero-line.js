@@ -38,6 +38,7 @@
   var roll = rollers.firstChild;
   var machine = scene.querySelector('.hl-machine');
   var naka = scene.querySelector('.hl-naka');
+  var nakaBody = naka; // what bobs on the machine: the plush, or the round screen once it is built
   var backLayer = scene.querySelector('[data-hl-back]');
   var itemLayer = scene.querySelector('[data-hl-items]');
   var frontLayer = scene.querySelector('[data-hl-front]');
@@ -287,6 +288,38 @@
   }
 
   var videosOn = false;
+
+  // ---------- Naka at work (showcase/menu/mascot-*.mp4, square crops of the in-app animations) ----------
+  // Once videos are on, the plush on the machine becomes a round screen that runs the studio's real steps
+  // in turn, one whole clip each, with the step named beside it. Reduced motion and light data keep the plush.
+  var STEPS = [['writing', 'กำลังเขียนบท'], ['voice', 'กำลังพากย์เสียง'], ['rendering', 'กำลังทำคลิป'], ['done', 'เสร็จแล้ว!']];
+  var mascot = null;
+  function buildMascot() {
+    var box = document.createElement('div');
+    box.className = 'hl-mascot';
+    box.setAttribute('aria-hidden', 'true');
+    box.innerHTML = '<div class="hl-mascot-screen">' + STEPS.map(function (st, i) {
+      return '<video muted playsinline preload="' + (i ? 'none' : 'auto') + '" poster="/showcase/menu/mascot-' + st[0] + '.jpg"><source src="/showcase/menu/mascot-' + st[0] + '.mp4" type="video/mp4"></video>';
+    }).join('') + '</div><span class="hl-mascot-tag"></span>';
+    machine.appendChild(box);
+    var vids = Array.prototype.slice.call(box.querySelectorAll('video'));
+    var tag = box.querySelector('.hl-mascot-tag');
+    var step = 0;
+    var play = function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); };
+    function show(i) {
+      step = i;
+      vids.forEach(function (v, k) { v.classList.toggle('is-on', k === i); if (k !== i) v.pause(); });
+      tag.textContent = STEPS[i][1];
+      vids[i].currentTime = 0;
+      if (running) play(vids[i]);
+      vids[(i + 1) % vids.length].preload = 'auto'; // the next step is ready when this one ends
+    }
+    vids.forEach(function (v, k) { v.addEventListener('ended', function () { if (k === step) show((k + 1) % vids.length); }); });
+    naka.classList.add('is-replaced');
+    nakaBody = box;
+    show(0);
+    return { run: function (on) { if (on) play(vids[step]); else vids[step].pause(); } };
+  }
   function syncVideo(it, want) {
     var v = it.video;
     if (!v) return;
@@ -351,7 +384,7 @@
     // the SVG machine HUD and the arms repaint as whole images, so they redraw every other frame;
     // the belt, boxes and phones (compositor transforms) still move every frame
     if (!(tick++ & 1) || !running) { drawMachine(t, G.glow || 0); placeArms(t); }
-    naka.style.transform = 'translateY(' + (-3 * Math.abs(Math.sin(t * 2.2))).toFixed(2) + 'px) rotate(' + (3 * Math.sin(t * 1.1)).toFixed(2) + 'deg)';
+    nakaBody.style.transform = 'translateY(' + (-3 * Math.abs(Math.sin(t * 2.2))).toFixed(2) + 'px) rotate(' + (3 * Math.sin(t * 1.1)).toFixed(2) + 'deg)';
   }
 
   // ---------- loop ----------
@@ -369,6 +402,7 @@
     running = on;
     if (on) { last = performance.now(); raf = requestAnimationFrame(frame); }
     else { cancelAnimationFrame(raf); items.forEach(function (it) { syncVideo(it, false); }); }
+    if (mascot) mascot.run(on);
   }
 
   buildMachine();
@@ -384,6 +418,6 @@
   var rt = 0;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { layout(); draw(clock); }, 120); });
   // videos start shortly after first paint (not on window load, which slow assets can hold back), never on save-data or 2g
-  if (!lightData) setTimeout(function () { videosOn = true; }, 1200);
+  if (!lightData) setTimeout(function () { videosOn = true; mascot = buildMascot(); mascot.run(running); }, 1200);
   setRunning(true);
 })();
