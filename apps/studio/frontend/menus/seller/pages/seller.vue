@@ -71,7 +71,7 @@
         <article
           v-for="(p, i) in filteredPosts" :key="p.id" class="sl-card" tabindex="0" role="button"
           :style="{ animationDelay: `${i * 0.04}s` }"
-          :aria-label="t('seller.list.openAria', { title: p.title || p.productName })"
+          :aria-label="t('seller.list.openAria', { title: p.title || p.productName || t('seller.workspace.untitled') })"
           @click="open(p)" @keydown.enter.self.prevent="open(p)" @keydown.space.self.prevent="open(p)"
         >
           <div class="sl-thumb" aria-hidden="true">
@@ -82,7 +82,7 @@
           </div>
           <div class="sl-card-body">
             <div class="sl-card-top">
-              <h3 class="sl-card-title truncate">{{ p.title || p.productName }}</h3>
+              <h3 class="sl-card-title truncate">{{ p.title || p.productName || t('seller.workspace.untitled') }}</h3>
               <AppMenu :open="menuId === p.id" placement="bottom-end" :min-width="120" @update:open="(v) => { menuId = v ? p.id : null }">
                 <template #trigger>
                   <button class="sl-more" type="button" :title="t('common.more')" :aria-label="t('common.more')" @click.stop>
@@ -122,13 +122,45 @@
               {{ t('seller.create.withSkill', { skill: skillName }) }}
             </p>
             <label class="field">
-              <span class="field-label">{{ t('seller.product.url') }}</span>
+              <span class="field-label">{{ t('seller.create.what') }}</span>
+              <input v-model="form.productName" class="input" :placeholder="t('seller.product.namePlaceholder')" />
+            </label>
+
+            <div class="field">
+              <span class="field-label">{{ t('seller.create.media') }} <span class="sl-count">{{ form.productImages.length }}/{{ MAX_IMAGES }}</span></span>
+              <div class="sl-media">
+                <div v-for="img in form.productImages" :key="img" class="sl-shot">
+                  <img :src="img" alt="" />
+                  <button type="button" class="sl-shot-del" :aria-label="t('seller.product.removeImage')" :disabled="creating" @click="removeImage(img)">
+                    <X :size="12" :stroke-width="2.4" />
+                  </button>
+                </div>
+                <button v-if="form.productImages.length < MAX_IMAGES" type="button" class="sl-add" :disabled="uploadingImage || creating" @click="imageInput?.click()">
+                  <Loader2 v-if="uploadingImage" :size="16" class="animate-spin" />
+                  <ImagePlus v-else :size="16" :stroke-width="1.8" />
+                  <span>{{ t('seller.product.addImage') }}</span>
+                </button>
+                <div class="sl-clip">
+                  <video v-if="form.videoUrl" :src="`${form.videoUrl}#t=0.1`" muted preload="metadata" />
+                  <button v-else type="button" class="sl-add sl-add-video" :disabled="uploadingVideo || creating" @click="videoInput?.click()">
+                    <Loader2 v-if="uploadingVideo" :size="16" class="animate-spin" />
+                    <Upload v-else :size="16" :stroke-width="1.8" />
+                    <span>{{ t('seller.video.upload') }}</span>
+                  </button>
+                  <button v-if="form.videoUrl" type="button" class="sl-shot-del" :aria-label="t('seller.video.remove')" :disabled="creating" @click="clearVideo">
+                    <X :size="12" :stroke-width="2.4" />
+                  </button>
+                </div>
+                <input ref="imageInput" type="file" accept="image/*" multiple hidden @change="uploadImages" />
+                <input ref="videoInput" type="file" accept="video/*" hidden @change="uploadVideo" />
+              </div>
+              <span class="field-hint">{{ t('seller.create.mediaHint') }}</span>
+            </div>
+
+            <label class="field">
+              <span class="field-label">{{ t('seller.create.urlOptional') }}</span>
               <input v-model="form.productUrl" class="input" type="url" :placeholder="t('seller.product.urlPlaceholder')" />
               <span class="field-hint">{{ t('seller.create.urlHint') }}</span>
-            </label>
-            <label class="field">
-              <span class="field-label">{{ t('seller.product.name') }}</span>
-              <input v-model="form.productName" class="input" :placeholder="t('seller.product.namePlaceholder')" />
             </label>
 
             <div v-if="studioVideos.length && !skill" class="field">
@@ -148,8 +180,8 @@
           </div>
           <div class="dialog-foot">
             <span v-if="!canCreate" class="sl-foot-hint">{{ t('seller.create.needProduct') }}</span>
-            <button type="button" class="btn" :disabled="creating" @click="closeCreate">{{ t('common.cancel') }}</button>
-            <button type="submit" class="btn btn-primary" :disabled="creating || !canCreate">
+            <button type="button" class="btn" :disabled="creating || uploading" @click="closeCreate">{{ t('common.cancel') }}</button>
+            <button type="submit" class="btn btn-primary" :disabled="creating || uploading || !canCreate">
               <Loader2 v-if="creating" :size="13" class="animate-spin" />
               {{ creating ? t('seller.create.creating') : t('seller.create.submit') }}
             </button>
@@ -175,9 +207,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { Clock, Film, LayoutGrid, Loader2, MoreHorizontal, Package, Plus, Search, ShoppingBag, Store, X } from 'lucide-vue-next'
+import { Clock, Film, ImagePlus, LayoutGrid, Loader2, MoreHorizontal, Package, Plus, Search, ShoppingBag, Store, Upload, X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
-import { sellerAPI, studioAPI, type SellerPost, type SellerStudioVideo, type StudioTemplate } from '~/composables/useApi'
+import { sellerAPI, studioAPI, uploadAPI, type SellerPost, type SellerStudioVideo, type StudioTemplate } from '~/composables/useApi'
 import { toastError } from '~/composables/useToast'
 import { menuArt, templateArt } from '~/utils/studioArt'
 import MenuHeroArt from '~/components/MenuHeroArt.vue'
@@ -244,34 +276,90 @@ async function load() {
 }
 
 // ===== create =====
+const MAX_IMAGES = 9
 const showCreate = ref(false)
 const creating = ref(false)
-const form = ref<{ productUrl: string; productName: string; studioProjectId: number | null }>({ productUrl: '', productName: '', studioProjectId: null })
+const uploadingImage = ref(false)
+const uploadingVideo = ref(false)
+const uploading = computed(() => uploadingImage.value || uploadingVideo.value)
+const imageInput = ref<HTMLInputElement | null>(null)
+const videoInput = ref<HTMLInputElement | null>(null)
+const form = ref<{ productUrl: string; productName: string; studioProjectId: number | null; productImages: string[]; videoUrl: string | null }>({
+  productUrl: '', productName: '', studioProjectId: null, productImages: [], videoUrl: null,
+})
 const studioVideos = ref<SellerStudioVideo[]>([])
-const canCreate = computed(() => !!(form.value.productName.trim() || form.value.productUrl.trim()))
+const canCreate = computed(() => !!(
+  form.value.productName.trim() || form.value.productUrl.trim() || form.value.productImages.length || form.value.videoUrl
+))
 
+function blankForm() {
+  return { productUrl: '', productName: '', studioProjectId: null, productImages: [] as string[], videoUrl: null as string | null }
+}
 async function openCreate() {
-  form.value = { productUrl: '', productName: '', studioProjectId: null }
+  form.value = blankForm()
   showCreate.value = true
   try { studioVideos.value = await sellerAPI.studioVideos() || [] } catch { studioVideos.value = [] }
 }
 function closeCreate() {
-  if (creating.value) return
+  if (creating.value || uploading.value) return
   showCreate.value = false
   skill.value = ''
+}
+function removeImage(img: string) {
+  form.value.productImages = form.value.productImages.filter(i => i !== img)
+}
+function clearVideo() {
+  form.value.videoUrl = null
+  form.value.studioProjectId = null
+}
+async function uploadImages(ev: Event) {
+  const input = ev.target as HTMLInputElement
+  const files = [...(input.files || [])].slice(0, MAX_IMAGES - form.value.productImages.length)
+  input.value = ''
+  if (!files.length) return
+  uploadingImage.value = true
+  try {
+    for (const file of files) {
+      const res = await uploadAPI.image(file)
+      form.value.productImages = [...form.value.productImages, res.url].slice(0, MAX_IMAGES)
+    }
+  } catch (e) {
+    toastError(e)
+  } finally {
+    uploadingImage.value = false
+  }
+}
+async function uploadVideo(ev: Event) {
+  const input = ev.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  uploadingVideo.value = true
+  try {
+    const res = await uploadAPI.video(file)
+    form.value.videoUrl = res.url
+    form.value.studioProjectId = null
+  } catch (e) {
+    toastError(e)
+  } finally {
+    uploadingVideo.value = false
+  }
 }
 function pickVideo(v: SellerStudioVideo) {
   if (form.value.studioProjectId === v.projectId) {
     form.value.studioProjectId = null
+    if (form.value.videoUrl === v.videoUrl) form.value.videoUrl = null
     return
   }
   form.value.studioProjectId = v.projectId
-  form.value.productName = v.productName || v.title
-  form.value.productUrl = v.productUrl || form.value.productUrl
+  form.value.videoUrl = v.videoUrl
+  if (!form.value.productName.trim()) form.value.productName = v.productName || v.title
+  if (!form.value.productUrl.trim() && v.productUrl) form.value.productUrl = v.productUrl
+  if (!form.value.productImages.length) form.value.productImages = v.productImages.slice(0, MAX_IMAGES)
 }
 
 async function create() {
-  if (!canCreate.value || creating.value) return
+  if (!canCreate.value || creating.value || uploading.value) return
   creating.value = true
   try {
     const url = form.value.productUrl.trim()
@@ -279,29 +367,26 @@ async function create() {
     const data: Partial<SellerPost> = {
       productName: form.value.productName.trim(),
       productUrl: url || null,
+      productImages: [...form.value.productImages],
     }
-    if (video) {
-      Object.assign(data, {
-        videoUrl: video.videoUrl,
-        studioProjectId: video.projectId,
-        productImages: video.productImages,
-        productDescription: video.productDescription,
-      })
-    } else if (url) {
-      // ดึงชื่อ/รูป/ราคาจากหน้าสินค้า — ล้มเหลวก็สร้างต่อได้ (กรอกเองในหน้าโพสต์)
+    if (form.value.videoUrl) {
+      data.videoUrl = form.value.videoUrl
+      data.studioProjectId = form.value.studioProjectId
+    }
+    if (video?.productDescription && !data.productDescription) data.productDescription = video.productDescription
+    if (url) {
+      // ดึงชื่อ/รูป/ราคาจากหน้าสินค้า — ล้มเหลวก็สร้างต่อได้ รูปที่อัปโหลดเองไม่ถูกทับ
       try {
         const info = await sellerAPI.ingestUrl(url)
-        Object.assign(data, {
-          productName: data.productName || info.productName,
-          productDescription: info.productDescription || null,
-          productPrice: info.price,
-          productImages: info.images,
-        })
+        data.productName = data.productName || info.productName
+        data.productDescription = data.productDescription || info.productDescription || null
+        data.productPrice = info.price
+        data.productImages = [...new Set([...(data.productImages || []), ...info.images])].slice(0, MAX_IMAGES)
       } catch {
         toast.info(t('seller.create.ingestFailed'))
       }
     }
-    if (!data.productName) data.productName = url
+    if (!data.productName && url) data.productName = url
     const post = await sellerAPI.create(data)
     navigateTo(skill.value ? { path: `/seller/${post.id}`, query: { skill: skill.value }, hash: '#skill-video' } : `/seller/${post.id}`)
   } catch (e) {
@@ -474,6 +559,27 @@ onMounted(() => {
 .field-label { font-size: 11.5px; font-weight: 600; color: var(--text-1); }
 .field-hint { font-size: 11px; color: var(--text-3); line-height: 1.5; }
 .sl-foot-hint { margin-right: auto; align-self: center; font-size: 11.5px; color: var(--text-3); }
+.sl-count { margin-left: 4px; font-weight: 500; color: var(--text-3); }
+.sl-media { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+.sl-shot, .sl-add, .sl-clip {
+  position: relative; width: 84px; height: 84px; border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border); background: var(--bg-2);
+}
+.sl-clip { height: 120px; }
+.sl-shot img, .sl-clip video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
+.sl-shot-del {
+  position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 50%; background: rgba(0, 0, 0, 0.6); color: #fff; cursor: pointer;
+}
+.sl-shot-del:disabled { opacity: 0.5; cursor: default; }
+.sl-add {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border-style: dashed; color: var(--text-2); font: 600 10.5px var(--font-body); cursor: pointer;
+}
+.sl-add:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-text); }
+.sl-add:disabled { opacity: 0.6; cursor: default; }
+.sl-add-video { width: 100%; height: 100%; border: none; background: transparent; }
 .sl-videos { display: flex; gap: 8px; overflow-x: auto; padding: 2px; }
 .sl-video {
   display: flex; flex-direction: column; gap: 4px; width: 92px; flex-shrink: 0; padding: 4px;

@@ -5,10 +5,12 @@
     "subtitle": "Turn a product review video into ready-to-post sales posts with images, product link and a pinned comment. AI writes relaxed captions for TikTok, Shopee, Facebook and Instagram.",
     "steps": {
       "aria": "Steps",
-      "product": "Product",
-      "productDesc": "Paste a shop link to pull the name, images and price",
-      "video": "Review video",
-      "videoDesc": "Let AI make the video with a skill from the library, or upload your clip",
+      "product": "Product and footage",
+      "productDesc": "Choose what you sell, then add the photos or video you filmed",
+      "video": "Footage you filmed",
+      "videoDesc": "Upload your own clip, or let AI make one from the Skills Library",
+      "details": "Details",
+      "detailsDesc": "Price, selling points and the affiliate link can wait",
       "copy": "Captions & channels",
       "copyDesc": "AI writes captions, hashtags and a comment with your link"
     },
@@ -16,7 +18,7 @@
       "new": "New sales post",
       "openAria": "Open post {title}",
       "emptyTitle": "No sales posts yet",
-      "emptyDesc": "Start from a product link, or pick a finished video from the Skills Library."
+      "emptyDesc": "Start by choosing a product and adding the photos or clip you filmed. The affiliate link can wait."
     },
     "status": {
       "draft": "Draft",
@@ -37,11 +39,15 @@
     },
     "create": {
       "title": "New sales post",
-      "desc": "Add a product link (Shopee, Lazada, TikTok Shop…) or a product name. You can pick the video in the next step.",
-      "urlHint": "We pull the name, images and price automatically when the site allows it.",
+      "desc": "Choose what you sell and add the photos or clip you filmed. The affiliate link and other details can wait.",
+      "what": "What are you selling",
+      "media": "Product photos or a video you filmed",
+      "mediaHint": "Upload them first. Details such as the affiliate link go on the next page.",
+      "urlOptional": "Product link (optional for now)",
+      "urlHint": "Skip this if you want. A shop link can pull the name, images and price.",
       "fromStudio": "Or pick a finished video from the Skills Library",
       "fromStudioHint": "Uses the product details and images from that project.",
-      "needProduct": "Add a link or product name",
+      "needProduct": "Add a product name, or upload a photo or video",
       "submit": "Create post",
       "creating": "Creating…",
       "ingestFailed": "Could not read that link. Fill in the details on the next page.",
@@ -55,6 +61,7 @@
     "product": {
       "name": "Product name",
       "namePlaceholder": "e.g. Vitamin C serum 30ml",
+      "nameHint": "You can leave this for later. AI needs a name before it writes captions.",
       "price": "Price",
       "pricePlaceholder": "e.g. ฿299",
       "url": "Product link",
@@ -100,7 +107,7 @@
       "hashtags": "Hashtags",
       "comment": "Pinned comment",
       "linkAppended": "Link added automatically:",
-      "noLink": "No product link yet. Add one in step 1 to include it in the comment.",
+      "noLink": "No link yet. Add a product or affiliate link in Details to include it in the comment.",
       "copyPost": "Copy caption",
       "copyComment": "Copy comment + link",
       "copiedPost": "Caption copied",
@@ -143,7 +150,7 @@
         "failed": "Video failed",
         "cancelled": "Video stopped"
       },
-      "selectedHint": "About {n} seconds · uses the product name, details, price and images from step 1",
+      "selectedHint": "About {n} seconds · uses the name, photos, price and details you already added",
       "presenter": "Presenter",
       "presenterPick": "Pick a presenter",
       "presenterNone": "No presenter",
@@ -158,7 +165,7 @@
     },
     "home": {
       "kicker": "NAKA AI Seller",
-      "subtitle": "Pick a skill, add a product, and AI makes the review video, writes captions and attaches images and links, ready for TikTok, Shopee, Facebook and Instagram.",
+      "subtitle": "Choose what you sell, add the photos or clip you filmed, then fill in details like an affiliate link. AI helps with the video and captions.",
       "searchPlaceholder": "Search skills or posts, e.g. review, unboxing…",
       "skillsTitle": "Pick a skill to start selling",
       "skillsDesc": "Each skill is a sales-video format. Pick one, add your product, and AI makes the video and captions.",
