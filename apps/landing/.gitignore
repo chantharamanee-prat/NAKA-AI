@@ -12,3 +12,6 @@ creative/godot-flow/.godot/
 .openclaw/
 creative/unsloth-reel/out/
 creative/unsloth-reel/.env.local
+creative/sky-reel/out/
+creative/sky-reel/snapshots/
+creative/sky-reel/assets/audio/

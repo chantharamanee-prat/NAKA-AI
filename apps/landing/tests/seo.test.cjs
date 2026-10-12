@@ -67,14 +67,15 @@ test('English home: its own title, description and one H1; every local file it u
   }
   for (const [, id] of en.matchAll(/href="#([\w-]+)"/g)) assert.match(en, new RegExp(`id="${id}"`), `#${id} has no target`);
   assert.doesNotMatch(en, /hero-line\.js|gallery\.js|account-menu\.js/);
-  assert.match(en, /data-ready/, 'all 12 clips show without gallery.js');
+  assert.match(en, /data-ready/, 'every clip shows without scripts');
 });
 
 test('clip titles in the gallery are plain text, so the headings outline the page and not 80 clip names', () => {
   for (const html of [th, en]) {
     assert.doesNotMatch(html, /class="g-cap"><h3>/);
     assert.ok((html.match(/<strong class="g-title">/g) || []).length >= 12);
-    assert.ok((html.match(/<h3[\s>]/g) || []).length <= 15, 'only section-level h3s remain');
+    // section-level h3s only: 5 clip rows, 3 other-menu cards, 3 steps, 6 notes before you start, 4 (hidden) plans
+    assert.ok((html.match(/<h3[\s>]/g) || []).length <= 24, 'only section-level h3s remain');
   }
 });
 
