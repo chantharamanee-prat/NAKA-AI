@@ -39,4 +39,6 @@ One PostgreSQL 17 (`docker-compose.yml` at the root, `npm run db:up`) for both a
 
 ## Architecture decisions
 
+`docs/architecture.md` — the current system map and the decision table for "a feature like this goes here, touches these files", plus the rules that are easy to miss and today's real gaps. Read it before planning a feature that spans the two apps.
+
 `docs/adr/` — 0001 (merge + service boundaries), 0002 (Docker-only platform on the owner's host), 0003 (studio split into per-menu modules — done), 0004 (shared PostgreSQL, no RabbitMQ/Redis). Check them before restructuring.
