@@ -28,6 +28,7 @@ test('each studio menu opens on STUDIO_URL', () => {
   assert.deepEqual(go('/go/studio/live'), { status: 302, location: 'https://studio.naka.test/live' });
   assert.deepEqual(go('/go/studio/seller'), { status: 302, location: 'https://studio.naka.test/seller' });
   assert.deepEqual(go('/go/studio/marketer'), { status: 302, location: 'https://studio.naka.test/marketer' });
+  assert.deepEqual(go('/go/studio/social'), { status: 302, location: 'https://studio.naka.test/social' });
 });
 
 test('an unknown menu goes to the studio home, never to an arbitrary path', () => {

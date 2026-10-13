@@ -1,4 +1,5 @@
 // The home page's clip gallery ("คลังคลิปจริง", public/index.html #reel), managed from /admin/content/.
+// It is one row per studio menu: each `.g-track` names the categories it holds in data-cats.
 // The cards written in the HTML stay the source of truth for what they show. A showcase_clips row hides
 // one, gives it a place in the order, or adds a clip an admin uploaded (stored in MEDIA, served from
 // /showcase-media/). The server rewrites the gallery when it serves "/", and leaves the page exactly
@@ -10,15 +11,17 @@ export const CATEGORIES = { review: 'วิดีโอรีวิว', drama: 
 type Category = keyof typeof CATEGORIES;
 // what an uploaded card says and links to, like the written cards of the same category
 const CARD: Record<Category, { chip: string; href: string; cta: string }> = {
-  review: { chip: 'รีวิวสินค้า', href: '/go/studio/skills', cta: 'ทำแบบนี้ในคลังสกิล ↗' },
-  drama: { chip: 'ละครสั้น', href: '/go/studio/drama', cta: 'ทำละครแบบนี้ ↗' },
-  live: { chip: 'AI Live', href: '/go/studio/live', cta: 'ตั้งค่าไลฟ์ ↗' },
-  bot: { chip: 'แชทบอท', href: '/app/inbox/', cta: 'ตั้งค่าบอท ↗' },
+  review: { chip: 'รีวิวสินค้า', href: '/go/studio/skills', cta: 'ทำแบบนี้ในคลังสกิล →' },
+  drama: { chip: 'ละครสั้น', href: '/go/studio/drama', cta: 'ทำละครแบบนี้ →' },
+  live: { chip: 'AI Live', href: '/go/studio/live', cta: 'ตั้งค่าไลฟ์ →' },
+  bot: { chip: 'แชทบอท', href: '/app/inbox/', cta: 'ตั้งค่าบอท →' },
 };
 const MAX_VIDEO = 40 * 1024 * 1024;
 const MAX_POSTER = 3 * 1024 * 1024;
 const MEDIA_KEY = /^showcase\/[0-9a-f-]{36}\.(mp4|jpg|png|webp)$/;
-const GRID_OPEN = '<div class="g-shell g-grid">';
+const GALLERY_OPEN = '<section class="g-gallery"';
+// a row's track: its opening tag (with the categories it holds), its cards, and the marker that closes it
+const TRACK = /(<div class="g-track"[^>]*\bdata-cats="([\w ]+)"[^>]*>)[\s\S]*?(\n[ \t]*<\/div><!-- \/track -->)/g;
 const now = () => Math.floor(Date.now() / 1000);
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
@@ -33,11 +36,10 @@ const unescape = (s: string) => s.replace(/&(amp|lt|gt|quot|#39);/g, (_, e) => (
 
 export interface WrittenCard { id: string; category: string; title: string; poster: string | null; video: boolean; html: string; index: number }
 
-/** The cards in the gallery grid of the home page, in their written order, or null if the grid is not found. */
+/** The cards in the gallery rows of the home page, in their written order (row by row), or null if there is no gallery. */
 export function parseGallery(html: string): { start: number; end: number; cards: WrittenCard[] } | null {
-  const open = html.indexOf(GRID_OPEN);
-  if (open < 0) return null;
-  const start = open + GRID_OPEN.length;
+  const start = html.indexOf(GALLERY_OPEN);
+  if (start < 0) return null;
   const stop = html.indexOf('</section>', start);
   const pattern = /<article class="g-card[^"]*"[\s\S]*?<\/article>/g;
   pattern.lastIndex = start;
@@ -90,16 +92,22 @@ function arrange(cards: WrittenCard[], rows: ClipRow[]): Placed[] {
   return placed.sort((a, b) => a.key - b.key || a.tie - b.tie);
 }
 
-/** The home page with the gallery as the admins arranged it; the counts on the tabs and the heading follow. */
+/** The home page with the gallery as the admins arranged it: every row refilled in that order, the counts following. */
 export function renderGallery(html: string, rows: ClipRow[]): string {
   if (!rows.length) return html;
   const parsed = parseGallery(html);
   if (!parsed) return html;
   const shown = arrange(parsed.cards, rows).filter(p => !p.hidden);
-  const out = html.slice(0, parsed.start) + '\n        ' + shown.map(p => p.html).join('\n        ') + html.slice(parsed.end);
-  const count = (tab: string) => tab === 'all' ? shown.length : shown.filter(p => p.category === tab).length;
+  // a row's count is keyed by the first category it holds (the review row also holds the Naka clips)
+  const counts: Record<string, number> = {};
+  const out = html.replace(TRACK, (_, open: string, cats: string, close: string) => {
+    const holds = cats.split(' ');
+    const inRow = shown.filter(p => holds.includes(p.category));
+    counts[holds[0]] = inRow.length;
+    return open + '\n        ' + inRow.map(p => p.html).join('\n        ') + close;
+  });
   return out
-    .replace(/(<button type="button" data-tab="(\w+)"[^>]*>[^<]*<span>)\d+(<\/span>)/g, (_, head: string, tab: string, tail: string) => head + count(tab) + tail)
+    .replace(/(data-rail-count="(\w+)">)\d+(<)/g, (all: string, head: string, row: string, tail: string) => row in counts ? head + counts[row] + tail : all)
     .replace(/(คลังคลิปจริง · )\d+( คลิป)/, (_, a: string, b: string) => a + shown.filter(p => p.video).length + b);
 }
 

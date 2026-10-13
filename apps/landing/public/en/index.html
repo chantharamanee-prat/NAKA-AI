@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="theme-color" content="#579edf">
   <title>AI Sales Videos with Thai Voice-Over for TikTok Shop | naka-ai</title>
   <meta name="description" content="naka-ai turns a product photo into sales videos, short dramas and avatar live selling with Thai voice-over, ready for TikTok Shop, Shopee and Facebook in Thailand.">
   <meta property="og:title" content="Got a product photo? Get a sales clip. · naka-ai">
@@ -74,93 +74,145 @@
   <link rel="stylesheet" href="/member.css">
   <link rel="stylesheet" href="/landing.css">
   <link rel="stylesheet" href="/hero-line.css">
+  <link rel="stylesheet" href="/sky.css">
+  <link rel="stylesheet" href="/motion.css">
   <link rel="stylesheet" href="/ui-land.css">
   <link rel="stylesheet" href="/en/en.css">
   <script src="/landing.js" defer></script>
   <script src="/glass-nav.js" defer></script>
+  <script src="/sky.js" defer></script>
+  <script src="/sky-gl.js" defer></script>
+  <script src="/motion.js" defer></script>
+  <script src="/rails.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="landing-nav glass-nav">
     <div class="shell nav-row">
-      <a class="brand" href="/en/" aria-label="naka-ai home"><img src="/logo.svg?v=4" alt="" width="36" height="36"><span>naka<span>-ai</span><b>.</b></span><small class="brand-tag" aria-hidden="true">AI FACTORY</small></a>
-      <nav class="nav-links" aria-label="Main menu">
-        <a class="nav-plain" href="#studio">Naka Studio</a>
-        <a class="nav-plain" href="#reel">Clips</a>
-        <a class="nav-plain" href="#how">How it works</a>
-        <a class="nav-plain" href="#trust">Before you start</a>
+      <a class="brand" href="/en/" aria-label="naka-ai home"><svg class="brand-mark" viewBox="0 0 48 48" width="36" height="36" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#1D50BE"/><path class="lm-body" pathLength="1" d="M11.5 34.5V20.5c0-5.3 2.7-8.5 7-8.5 8.2 0 7 24 14 24 3.8 0 5.8-3.2 5.8-8V20" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path class="lm-head" style="--i:0" d="M11.8 33.1c-2.9 1.2-5 .25-6.2-2.55-.35 3.55 1.3 6.75 4.85 7.55 3.1.7 5.7-.85 6.55-3.75-1.7 1.05-3.85.85-5.2-1.25z" fill="#fff"/><path class="lm-head" style="--i:1" d="M7.8 33c.9 1.45 2.1 2.2 3.75 2.15" fill="none" stroke="#8DDDF3" stroke-width="1.3" stroke-linecap="round"/><path class="lm-head" style="--i:2" d="M32.9 15.9c-.5-3.5.55-6.15 3.4-8.3.1 2.7.7 4.5 2.3 6.1z" fill="#8DDDF3"/><path class="lm-head" style="--i:3" d="M35.15 14.3c.3-3.75 1.65-6.3 4.65-8.3-.05 3.25.5 5.2 2.05 6.8z" fill="#fff"/><path class="lm-head" style="--i:4" d="M34.05 17.5c.45-3.05 2.55-5.1 5.3-5.1 2.5 0 4.45 1.6 4.45 3.55 0 1.15-.45 1.85-1.25 2.4l1.15 1.1c-1.85 1.45-4.55 2.1-7 1.2-1.65-.6-2.65-1.55-2.65-3.15z" fill="#fff"/><circle class="lm-head" style="--i:5" cx="39.85" cy="16.1" r="1.25" fill="#12316D"/><path class="lm-head" style="--i:6" d="M39.3 18.95c.7.45 1.5.4 2.2-.1" fill="none" stroke="#1D50BE" stroke-width=".8" stroke-linecap="round"/></svg><span>naka<span>-ai</span><b>.</b></span><small class="brand-tag" aria-hidden="true">AI FACTORY</small></a>
+      <!-- Main menu: the studio's own menus (apps/studio/frontend/menus), each jumping to its examples below -->
+      <nav class="nav-links" aria-label="Menus in Naka Studio">
+        <a class="nav-plain" href="#p-review">Skill library</a>
+        <a class="nav-plain" href="#p-drama">Drama studio</a>
+        <a class="nav-plain" href="#mo-li-viral-clone">Viral clone</a>
+        <a class="nav-plain" href="#p-live">AI Live</a>
+        <a class="nav-plain" href="#mo-li-seller">AI seller</a>
+        <a class="nav-plain" href="#mo-li-marketer">AI marketer</a>
+        <a class="nav-plain" href="#mo-li-social">Social</a>
         <a class="nav-plain nav-lang" href="/" hreflang="th" lang="th">ไทย</a>
       </nav>
       <a class="btn btn-primary btn-sm nav-cta" href="/go/studio/">Open Naka Studio <span aria-hidden="true">↗</span></a>
       <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span><span></span></button>
     </div>
     <nav class="mobile-nav shell" id="mobile-nav" aria-label="Mobile menu" hidden>
-      <a href="#studio"><b>Naka Studio</b><small>Six menus for video, live selling and sales posts</small></a>
-      <a href="#reel"><b>Clips</b><small>Real clips made with naka-ai</small></a>
+      <a href="#p-review"><b>Skill library</b><small>One product + a template become a review video</small></a>
+      <a href="#p-drama"><b>Drama studio</b><small>Short dramas in episodes, from script to clip</small></a>
+      <a href="#mo-li-viral-clone"><b>Viral clone</b><small>One reference clip becomes a set of ads</small></a>
+      <a href="#p-live"><b>AI Live</b><small>Live selling with a Thai-speaking avatar</small></a>
+      <a href="#mo-li-seller"><b>AI seller</b><small>Sales posts from a review video</small></a>
+      <a href="#mo-li-marketer"><b>AI marketer</b><small>From a product brief to ad ideas</small></a>
+      <a href="#mo-li-social"><b>Social</b><small>Comments from every page on one board</small></a>
+      <a href="/app/inbox/"><b>Chat bot</b><small>Automatic replies to chats and comments</small></a>
       <a href="#how"><b>How it works</b><small>From one product to a sales post</small></a>
-      <a href="/" hreflang="th" lang="th"><b>ภาษาไทย</b><small>naka-ai in Thai</small></a>
+      <a href="/" hreflang="th" lang="th"><b>ภาษาไทย</b><small>naka-ai ภาษาไทย</small></a>
       <a class="mobile-cta" href="/go/studio/">Open Naka Studio ↗</a>
     </nav>
   </header>
 
   <main id="main">
     <section class="hero hero-line en-hero" aria-labelledby="hero-title">
+      <div class="sky" data-sky data-sky-gl aria-hidden="true"><i class="sky-sun"></i><i class="sky-cloud c1"></i><i class="sky-cloud c2"></i><i class="sky-cloud c3"></i></div>
       <div class="shell hl-copy">
         <p class="eyebrow"><span class="pulse" aria-hidden="true"></span>Got a product photo? Get a sales clip.</p>
         <h1 id="hero-title">AI <span class="grad">sales videos</span>, short dramas<br>and live selling <span class="nw">with Thai voice-over</span></h1>
-        <p class="lead">Can't film, can't edit, no time to go live? Put your product into Naka Studio and choose a review video, a short drama or avatar live selling. naka-ai writes the script and the Thai voice-over, then the AI seller writes the sales post.</p>
-        <div class="quickstart-row hero-cta"><a class="btn btn-primary" href="/go/studio/">Open Naka Studio <span aria-hidden="true">↗</span></a><a class="btn btn-ghost" href="#reel">See real clips first</a></div>
+        <p class="lead">Put your product into Naka Studio and choose a review video, a short drama or avatar live selling. naka-ai writes the script and the Thai voice-over.</p>
+        <div class="quickstart-row hero-cta"><a class="btn btn-primary" href="/go/studio/">Open Naka Studio <span aria-hidden="true">↗</span></a></div>
+        <nav class="hero-menus" aria-label="Start from a menu in Naka Studio"><a href="/go/studio/skills"><img src="/showcase/menu/chip-skills.jpg" width="48" height="48" alt="">Skill library</a><a href="/go/studio/drama"><img src="/showcase/menu/chip-drama.jpg" width="48" height="48" alt="">Drama studio</a><a href="/go/studio/viral-clone"><img src="/showcase/menu/chip-viral-clone.jpg" width="48" height="48" alt="">Viral clone</a><a href="/go/studio/live"><img src="/showcase/menu/chip-live.jpg" width="48" height="48" alt="">AI Live</a><a href="/go/studio/seller"><img src="/showcase/menu/chip-seller.jpg" width="48" height="48" alt="">AI seller</a><a href="/go/studio/marketer"><img src="/showcase/menu/chip-marketer.jpg" width="48" height="48" alt="">AI marketer</a><a href="/go/studio/social"><img src="/showcase/menu/chip-social.jpg" width="48" height="48" alt="">Social</a><a class="hero-menus-all" href="#reel">See examples of every menu <span aria-hidden="true">↓</span></a></nav>
         <ul class="trial-notes" aria-label="Highlights">
-          <li>No filming, no talking</li><li>Thai voice-over</li><li>One account for the site and the studio</li>
+          <li>Every menu free for 7 days</li><li>No filming, no talking</li><li>Thai voice-over</li><li>One account for the site and the studio</li>
         </ul>
         <img class="en-naka" src="/assets/naka-plush-320.webp" width="200" height="200" alt="Naka, the naka-ai mascot">
       </div>
       <div class="shell platforms" aria-label="Where the clips go">
-        <span>Sell on</span><b>TikTok</b><b>Facebook</b><b>Instagram</b><b>Shopee</b>
-      </div>
-    </section>
-
-    <section class="st-menus" id="studio" aria-labelledby="studio-title">
-      <div class="shell">
-        <div class="u-head">
-          <p class="u-kicker">Naka Studio</p>
-          <h2 id="studio-title">Every sales job in one studio</h2>
-          <p>The same six menus as in the app. Pick one and it opens right there, with the same naka-ai account.</p>
-        </div>
-        <ol class="st-grid">
-          <li><a class="st-card" href="/go/studio/skills"><span class="st-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><path d="M16.5 13v7M13 16.5h7"/></svg></span><span class="st-menu">Skill library</span><b>Product review videos</b><span class="st-text">One product and one template become a review video with voice-over, for TikTok, Shopee and Lazada.</span><span class="st-go">Open the skill library <span aria-hidden="true">↗</span></span></a></li>
-          <li><a class="st-card" href="/go/studio/drama"><span class="st-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 9l3.5-5 4 1-3.5 5M10.5 5l4 1-3.5 5M14.5 6l4 1-3.5 5"/></svg></span><span class="st-menu">Drama studio</span><b>AI short dramas</b><span class="st-text">From a script to characters, scenes, a storyboard and video episode by episode, then one exported clip.</span><span class="st-go">Open the drama studio <span aria-hidden="true">↗</span></span></a></li>
-          <li><a class="st-card" href="/go/studio/viral-clone"><span class="st-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span><span class="st-menu">Viral clone studio</span><b>A set of ads in one click</b><span class="st-text">Take the structure of a reference clip, then swap the hook, product, presenter and language to make the whole set.</span><span class="st-go">Open the viral clone studio <span aria-hidden="true">↗</span></span></a></li>
-          <li><a class="st-card" href="/go/studio/live"><span class="st-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/></svg></span><span class="st-menu">AI Live</span><b>Live selling with an avatar</b><span class="st-text">An avatar speaks Thai from your sales script, answers comments from your shop's information and goes live on TikTok or Facebook.</span><span class="st-go">Open AI Live <span aria-hidden="true">↗</span></span></a></li>
-          <li><a class="st-card" href="/go/studio/seller"><span class="st-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12V4h8l9 9-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg></span><span class="st-menu">AI seller</span><b>Sales posts from a review video</b><span class="st-text">Captions, hashtags and a pinned comment with the product link, written separately for TikTok, Shopee, Facebook and Instagram.</span><span class="st-go">Open the AI seller <span aria-hidden="true">↗</span></span></a></li>
-          <li><a class="st-card" href="/go/studio/marketer"><span class="st-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="st-menu">AI marketer</span><b>From a brief to ad ideas</b><span class="st-text">Product brief, market research and four strategy documents, then ad ideas sent straight to video production.</span><span class="st-go">Open the AI marketer <span aria-hidden="true">↗</span></span></a></li>
-        </ol>
-        <p class="st-note">The menus you can use depend on your shop's plan. Most clips speak Thai: the studio is made for selling in Thailand.</p>
+        <span>Sell on</span><b><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#facebook"/></svg>Facebook</b><b><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#tiktok"/></svg>TikTok</b><b><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#instagram"/></svg>Instagram</b><b><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#x"/></svg>X</b><b><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#shopee"/></svg>Shopee</b><b><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#lazada"/></svg>Lazada</b>
       </div>
     </section>
 
     <section class="g-gallery en-gallery" id="reel" aria-labelledby="reel-title" data-ready>
+      <span class="g-anchor" id="studio"></span>
       <div class="g-shell g-head">
-        <p class="g-kicker">Real clips</p>
-        <h2 id="reel-title">See real work first</h2>
-        <p class="g-sub">Every clip was made with naka-ai, with Thai voice-over. The <a href="/#reel" hreflang="th">full library</a> has more than 80.</p>
+        <p class="g-kicker">Real clips · 19 clips</p>
+        <h2 id="reel-title">Real work from every menu<em class="nw"> in Naka Studio</em></h2>
+        <p class="g-sub">Every clip was made with naka-ai, with Thai voice-over. Start from the same style with the button under a clip, or press "Show more" under each menu. The <a href="/#reel" hreflang="th">full library</a> has more than 80.</p>
+        <p class="st-trial"><span class="st-badge">7 days free</span>Sign up and use every menu free for 7 days</p>
       </div>
-      <div class="g-shell g-grid">
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/review-soap.jpg" aria-hidden="true"><source src="/showcase/h3/review-soap.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Handmade herbal soap</strong><p>From one product photo</p><a class="g-use" href="/go/studio/skills">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-heir.jpg" aria-hidden="true"><source src="/showcase/h3/dr-heir.mp4" type="video/mp4"></video><span class="g-chip">Short drama</span><div class="g-cap"><strong class="g-title">The heir comes home</strong><p>Opening scene with dialogue</p><a class="g-use" href="/go/studio/drama">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-chili.jpg" aria-hidden="true"><source src="/showcase/h3/lv-chili.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Selling chili paste live</strong><p>Tasting on camera while selling</p><a class="g-use" href="/go/studio/live">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/rv-sunscreen.jpg" aria-hidden="true"><source src="/showcase/h3/rv-sunscreen.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Lightweight sunscreen</strong><p>Showing the texture</p><a class="g-use" href="/go/studio/skills">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-maid.jpg" aria-hidden="true"><source src="/showcase/h3/dr-maid.mp4" type="video/mp4"></video><span class="g-chip">Short drama</span><div class="g-cap"><strong class="g-title">The new maid</strong><p>First day at the mansion</p><a class="g-use" href="/go/studio/drama">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/thai-tea.jpg" aria-hidden="true"><source src="/showcase/h3/thai-tea.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Iced Thai tea</strong><p>Product shots with voice-over</p><a class="g-use" href="/go/studio/skills">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-skincare.jpg" aria-hidden="true"><source src="/showcase/h3/lv-skincare.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Selling a serum live</strong><p>The host shows the product</p><a class="g-use" href="/go/studio/live">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/streetfood.jpg" aria-hidden="true"><source src="/showcase/h3/streetfood.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Market-stall pad thai</strong><p>A vertical sales clip</p><a class="g-use" href="/go/studio/skills">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-durian.jpg" aria-hidden="true"><source src="/showcase/h3/lv-durian.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Orchard durian, live</strong><p>Selling straight from the orchard</p><a class="g-use" href="/go/studio/live">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lipstick.jpg" aria-hidden="true"><source src="/showcase/h3/lipstick.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Long-lasting lipstick</strong><p>An AI presenter speaking Thai</p><a class="g-use" href="/go/studio/skills">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/rv-coffee.jpg" aria-hidden="true"><source src="/showcase/h3/rv-coffee.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Medium-roast hill coffee</strong><p>The hook in the first 2 seconds</p><a class="g-use" href="/go/studio/skills">Make one like this ↗</a></div></article>
-        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-dress.jpg" aria-hidden="true"><source src="/showcase/h3/lv-dress.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Selling dresses live</strong><p>Answering size questions live</p><a class="g-use" href="/go/studio/live">Make one like this ↗</a></div></article>
+      <div class="g-rail" id="p-review" data-rail>
+        <div class="g-shell g-rail-head">
+          <div class="g-rail-copy"><p class="g-menu">Skill library</p><h3 id="rail-review">Product review videos <span class="g-count"><b>6</b> clips</span></h3><p>Add one product photo and pick a clip style. naka-ai writes the script and the Thai voice-over, ready for TikTok, Shopee and Lazada.</p></div>
+          <div class="g-rail-ctl"><a class="btn btn-primary btn-sm" href="/go/studio/skills">Open the skill library <span aria-hidden="true">→</span></a></div>
+        </div>
+        <div class="g-track" id="track-review">
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/review-soap.jpg" aria-hidden="true"><source src="/showcase/h3/review-soap.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Handmade herbal soap</strong><p>From one product photo</p><a class="g-use" href="/go/studio/skills">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/rv-sunscreen.jpg" aria-hidden="true"><source src="/showcase/h3/rv-sunscreen.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Lightweight sunscreen</strong><p>Showing the texture</p><a class="g-use" href="/go/studio/skills">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/thai-tea.jpg" aria-hidden="true"><source src="/showcase/h3/thai-tea.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Iced Thai tea</strong><p>Product shots with voice-over</p><a class="g-use" href="/go/studio/skills">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/streetfood.jpg" aria-hidden="true"><source src="/showcase/h3/streetfood.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Market-stall pad thai</strong><p>A vertical sales clip</p><a class="g-use" href="/go/studio/skills">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lipstick.jpg" aria-hidden="true"><source src="/showcase/h3/lipstick.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Long-lasting lipstick</strong><p>An AI presenter speaking Thai</p><a class="g-use" href="/go/studio/skills">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" data-poster="/showcase/h3/rv-coffee.jpg" aria-hidden="true"><source src="/showcase/h3/rv-coffee.mp4" type="video/mp4"></video><span class="g-chip">Review</span><div class="g-cap"><strong class="g-title">Medium-roast hill coffee</strong><p>The hook in the first 2 seconds</p><a class="g-use" href="/go/studio/skills">Make one like this →</a></div></article>
+        </div>
+        <div class="g-shell g-more"><button class="g-more-btn" type="button" data-more aria-controls="track-review" hidden>Show <span data-more-count></span> more <i aria-hidden="true">↓</i></button></div>
       </div>
-      <p class="g-shell g-note">Every clip is made by AI, picture and sound. Products, shops and characters are fictional examples.</p>
+      <div class="g-rail" id="p-drama" data-rail>
+        <div class="g-shell g-rail-head">
+          <div class="g-rail-copy"><p class="g-menu">Drama studio</p><h3 id="rail-drama">AI short dramas <span class="g-count"><b>5</b> clips</span></h3><p>Short dramas in episodes that bring viewers back: characters, scenes and video episode by episode, then one finished clip.</p></div>
+          <div class="g-rail-ctl"><a class="btn btn-primary btn-sm" href="/go/studio/drama">Open the drama studio <span aria-hidden="true">→</span></a></div>
+        </div>
+        <div class="g-track" id="track-drama">
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-heir.jpg" aria-hidden="true"><source src="/showcase/h3/dr-heir.mp4" type="video/mp4"></video><span class="g-chip">Short drama</span><div class="g-cap"><strong class="g-title">The heir comes home</strong><p>Opening scene with dialogue</p><a class="g-use" href="/go/studio/drama">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-maid.jpg" aria-hidden="true"><source src="/showcase/h3/dr-maid.mp4" type="video/mp4"></video><span class="g-chip">Short drama</span><div class="g-cap"><strong class="g-title">The new maid</strong><p>First day at the mansion</p><a class="g-use" href="/go/studio/drama">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-hallway.jpg" aria-hidden="true"><source src="/showcase/h3/dr-hallway.mp4" type="video/mp4"></video><span class="g-chip">Short drama</span><div class="g-cap"><strong class="g-title">The golden hallway</strong><p>Hard work nobody sees</p><a class="g-use" href="/go/studio/drama">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-letter.jpg" aria-hidden="true"><source src="/showcase/h3/dr-letter.mp4" type="video/mp4"></video><span class="g-chip">Twist</span><div class="g-cap"><strong class="g-title">The mystery letter</strong><p>A message that changes everything</p><a class="g-use" href="/go/studio/drama">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/dr-room4.jpg" aria-hidden="true"><source src="/showcase/h3/dr-room4.mp4" type="video/mp4"></video><span class="g-chip">Mystery</span><div class="g-cap"><strong class="g-title">Room number 4</strong><p>The door that should stay shut</p><a class="g-use" href="/go/studio/drama">Make one like this →</a></div></article>
+        </div>
+        <div class="g-shell g-more"><button class="g-more-btn" type="button" data-more aria-controls="track-drama" hidden>Show <span data-more-count></span> more <i aria-hidden="true">↓</i></button></div>
+      </div>
+      <div class="g-rail" id="p-live" data-rail>
+        <div class="g-shell g-rail-head">
+          <div class="g-rail-copy"><p class="g-menu">AI Live</p><h3 id="rail-live">AI Live: selling live with an avatar <span class="g-count"><b>4</b> clips</span></h3><p>An avatar speaks Thai from your sales script, answers comments from your shop information and goes live on TikTok or Facebook.</p></div>
+          <div class="g-rail-ctl"><a class="btn btn-primary btn-sm" href="/go/studio/live">Open AI Live <span aria-hidden="true">→</span></a></div>
+        </div>
+        <div class="g-track" id="track-live">
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-chili.jpg" aria-hidden="true"><source src="/showcase/h3/lv-chili.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Selling chili paste live</strong><p>Tasting on camera while selling</p><a class="g-use" href="/go/studio/live">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-skincare.jpg" aria-hidden="true"><source src="/showcase/h3/lv-skincare.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Selling a serum live</strong><p>The host shows the product</p><a class="g-use" href="/go/studio/live">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-durian.jpg" aria-hidden="true"><source src="/showcase/h3/lv-durian.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Orchard durian, live</strong><p>Selling straight from the orchard</p><a class="g-use" href="/go/studio/live">Make one like this →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/lv-dress.jpg" aria-hidden="true"><source src="/showcase/h3/lv-dress.mp4" type="video/mp4"></video><span class="g-chip">AI Live</span><div class="g-cap"><strong class="g-title">Selling dresses live</strong><p>Answering size questions live</p><a class="g-use" href="/go/studio/live">Make one like this →</a></div></article>
+        </div>
+        <div class="g-shell g-more"><button class="g-more-btn" type="button" data-more aria-controls="track-live" hidden>Show <span data-more-count></span> more <i aria-hidden="true">↓</i></button></div>
+      </div>
+      <div class="g-rail" id="p-bot" data-rail>
+        <div class="g-shell g-rail-head">
+          <div class="g-rail-copy"><p class="g-menu">Inbox on naka-ai</p><h3 id="rail-bot">Chat bot for customer replies <span class="g-count"><b>4</b> clips</span></h3><p>Answers chats and comments from your shop information, and hands decisions to a person in your shop.</p></div>
+          <div class="g-rail-ctl"><a class="btn btn-primary btn-sm" href="/app/inbox/">Set up the chat bot <span aria-hidden="true">→</span></a></div>
+        </div>
+        <div class="g-track" id="track-bot">
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/bt-packing.jpg" aria-hidden="true"><source src="/showcase/h3/bt-packing.mp4" type="video/mp4"></video><span class="g-chip">Chat bot</span><div class="g-cap"><strong class="g-title">The bot answers while you pack</strong><p>No need to stop working</p><a class="g-use" href="/app/inbox/">Set up the bot →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/bt-cafe.jpg" aria-hidden="true"><source src="/showcase/h3/bt-cafe.mp4" type="video/mp4"></video><span class="g-chip">Chat bot</span><div class="g-cap"><strong class="g-title">Busy cafe, the bot takes orders</strong><p>Answers the menu and prices</p><a class="g-use" href="/app/inbox/">Set up the bot →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/bt-morning.jpg" aria-hidden="true"><source src="/showcase/h3/bt-morning.mp4" type="video/mp4"></video><span class="g-chip">Chat bot</span><div class="g-cap"><strong class="g-title">Wake up to a full order list</strong><p>Replies to chats all night</p><a class="g-use" href="/app/inbox/">Set up the bot →</a></div></article>
+        <article class="g-card"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/h3/bt-handoff.jpg" aria-hidden="true"><source src="/showcase/h3/bt-handoff.mp4" type="video/mp4"></video><span class="g-chip">Hands over to staff</span><div class="g-cap"><strong class="g-title">Important? It goes to a person</strong><p>The bot knows when to stop</p><a class="g-use" href="/app/inbox/">Set up the bot →</a></div></article>
+        </div>
+        <div class="g-shell g-more"><button class="g-more-btn" type="button" data-more aria-controls="track-bot" hidden>Show <span data-more-count></span> more <i aria-hidden="true">↓</i></button></div>
+      </div>
+      <div class="g-rail g-more-menus" id="p-more">
+        <div class="g-shell g-rail-head"><div class="g-rail-copy"><p class="g-menu">Viral clone · AI seller · AI marketer · Social</p><h3 id="rail-more">More menus in Naka Studio</h3><p>No clips in the library yet: the clips on these cards are illustrations, not output of that menu.</p></div></div>
+        <ol class="g-shell st-grid st-more" aria-labelledby="rail-more">
+          <li id="mo-li-viral-clone"><a class="st-card" href="/go/studio/viral-clone" aria-labelledby="st-t3" aria-describedby="st-d3"><span class="st-clip is-illus"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/anim-director.jpg" aria-hidden="true"><source src="/showcase/menu/anim-director.mp4" type="video/mp4"></video><em>Illustration</em></span><h3 id="st-t3">An ad that already sells, turned into a whole set</h3><span class="st-text" id="st-d3">Add one reference clip, then change the opening line, product, presenter or language to get a set of ads.</span><span class="st-go">Open the viral clone studio <span aria-hidden="true">→</span></span></a></li>
+          <li id="mo-li-seller"><a class="st-card" href="/go/studio/seller" aria-labelledby="st-t5" aria-describedby="st-d5"><span class="st-clip is-illus"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/anim-writing.jpg" aria-hidden="true"><source src="/showcase/menu/anim-writing.mp4" type="video/mp4"></video><em>Illustration</em></span><h3 id="st-t5">A finished clip, then a sales post ready to publish</h3><span class="st-text" id="st-d5">Captions, hashtags and a pinned comment with the product link, written for each platform.</span><span class="st-go">Open the AI seller <span aria-hidden="true">→</span></span></a></li>
+          <li id="mo-li-marketer"><a class="st-card" href="/go/studio/marketer" aria-labelledby="st-t6" aria-describedby="st-d6"><span class="st-clip is-illus"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/anim-review.jpg" aria-hidden="true"><source src="/showcase/menu/anim-review.mp4" type="video/mp4"></video><em>Illustration</em></span><h3 id="st-t6">Not sure what to advertise? Get ideas</h3><span class="st-text" id="st-d6">Tell it about your product; naka-ai researches the market, suggests ad ideas and sends them on to video.</span><span class="st-go">Open the AI marketer <span aria-hidden="true">→</span></span></a></li>
+          <li id="mo-li-social"><a class="st-card" href="/go/studio/social" aria-labelledby="mo-social" aria-describedby="mo-social-d"><span class="st-clip is-illus"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/bt-comments.jpg" aria-hidden="true"><source src="/showcase/menu/bt-comments.mp4" type="video/mp4"></video><em>Illustration</em></span><h3 id="mo-social">Comments from every page on one board</h3><span class="st-text" id="mo-social-d">Social gathers comments from the pages you connect onto one board, to read and answer in one place.</span><span class="st-go">Open Social <span aria-hidden="true">→</span></span></a></li>
+        </ol>
+        <div class="g-shell st-note"><p>After 7 days, the menus you can use depend on your shop plan. Most clips speak Thai: the studio is made for selling in Thailand.</p><a href="/app/billing/">See plans</a><a href="/app/inbox/">Chatbot for customer replies</a></div>
+      </div>
+      <p class="g-shell g-note">Every clip is made by AI, picture and sound. Products, shops and characters are fictional examples. Some clip titles are translated from the Thai library.</p>
     </section>
 
     <section class="s-steps" id="how" aria-labelledby="steps-title">
@@ -185,11 +237,12 @@
           <h2 id="trust-title">Good to know <span class="nw">before you start</span></h2>
         </div>
         <dl class="t-stats">
-          <div><dt>Menus in one studio</dt><dd>6</dd></div>
+          <div><dt>Menus in one studio</dt><dd>7</dd></div>
           <div><dt>Account for the site and the studio</dt><dd>1</dd></div>
           <div><dt>Vertical video, ready to post</dt><dd>9:16</dd></div>
-          <div><dt>Sales channels the clips fit</dt><dd>4</dd></div>
+          <div><dt>Sales channels the clips fit</dt><dd>6</dd></div>
         </dl>
+        <ul class="t-platforms" aria-label="Sales channels the clips fit"><li><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#facebook"/></svg>Facebook</li><li><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#tiktok"/></svg>TikTok</li><li><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#instagram"/></svg>Instagram</li><li><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#x"/></svg>X</li><li><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#shopee"/></svg>Shopee</li><li><svg class="pf-logo" viewBox="0 0 24 24" aria-hidden="true"><use href="/assets/platforms.svg#lazada"/></svg>Lazada</li></ul>
         <ul class="t-list">
           <li><span class="why-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/></svg></span><div><h3>One account, no second sign-up</h3><p>Sign in at naka-ai once. Naka Studio uses the same account.</p></div></li>
           <li><span class="why-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg></span><div><h3>Made for selling in Thailand</h3><p>Voice-overs and live selling are in Thai, and posts follow Thai marketplaces: TikTok Shop, Shopee, Lazada and Facebook.</p></div></li>
@@ -200,11 +253,13 @@
     </section>
 
     <section class="c-end" aria-labelledby="end-title">
+      <div class="sky sky-low" data-sky aria-hidden="true"><i class="sky-sun"></i><i class="sky-cloud c1"></i><i class="sky-cloud c2"></i><i class="sky-cloud c3"></i></div>
       <div class="shell">
-        <img class="c-naka" src="/assets/naka-plush-320.webp" width="320" height="320" loading="lazy" alt="Naka, the naka-ai mascot">
+        <!-- every Naka clip in the library (showcase/menu/mascot-*.mp4, square crops of showcase/h3), in story order -->
+        <ul class="c-mascots" aria-label="What Naka does"><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-naka-hello.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-naka-hello.mp4" type="video/mp4"></video></span>Hi, I'm Naka</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-welcome.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-welcome.mp4" type="video/mp4"></video></span>Welcome</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-upload.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-upload.mp4" type="video/mp4"></video></span>Send a photo</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-writing.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-writing.mp4" type="video/mp4"></video></span>Writing the script</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-voice.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-voice.mp4" type="video/mp4"></video></span>Recording the voice</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-rendering.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-rendering.mp4" type="video/mp4"></video></span>Making the clip</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-done.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-done.mp4" type="video/mp4"></video></span>Done!</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-review.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-review.mp4" type="video/mp4"></video></span>Checking before posting</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-naka-line.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-naka-line.mp4" type="video/mp4"></video></span>The sales-clip line</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-drama-naka.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-drama-naka.mp4" type="video/mp4"></video></span>Action!</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-director.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-director.mp4" type="video/mp4"></video></span>Naka the director</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-live-naka.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-live-naka.mp4" type="video/mp4"></video></span>Selling silk live</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-lv-naka-host.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-lv-naka-host.mp4" type="video/mp4"></video></span>Hosting a live</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-bot-naka.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-bot-naka.mp4" type="video/mp4"></video></span>Answering chats nonstop</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-oops.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-oops.mp4" type="video/mp4"></video></span>Let me try again</li><li><span class="c-m"><video data-autoplay muted loop playsinline preload="none" poster="/showcase/menu/mascot-empty.jpg" aria-hidden="true"><source src="/showcase/menu/mascot-empty.mp4" type="video/mp4"></video></span>No jobs yet</li></ul>
         <h2 id="end-title">You sell.<br>naka-ai makes the rest.</h2>
         <p>Sign in or create an account, then start your first job in Naka Studio. Or call the team first.</p>
-        <div class="c-actions"><a class="btn btn-primary" href="/go/studio/">Open Naka Studio <span aria-hidden="true">↗</span></a><a class="btn btn-night" href="tel:+66892788587">Call the team +66 89 278 8587</a></div>
+        <div class="c-actions"><a class="btn btn-primary" href="/go/studio/">Open Naka Studio <span aria-hidden="true">↗</span></a><a class="btn btn-glass" href="tel:+66892788587">Call the team +66 89 278 8587</a></div>
       </div>
     </section>
   </main>
@@ -216,7 +271,7 @@
         <p><b>Got a product photo? Get a sales clip.</b> AI sales videos, short dramas, live selling and sales posts in Naka Studio, with Thai voice-over.</p>
       </div>
       <nav class="u-foot-col" aria-label="Naka Studio"><p>Naka Studio</p><a href="/go/studio/skills">Skill library</a><a href="/go/studio/drama">Drama studio</a><a href="/go/studio/viral-clone">Viral clone studio</a><a href="/go/studio/live">AI Live</a><a href="/go/studio/seller">AI seller</a><a href="/go/studio/marketer">AI marketer</a></nav>
-      <nav class="u-foot-col" aria-label="On this page"><p>On this page</p><a href="#reel">Clips</a><a href="#how">How it works</a><a href="#trust">Before you start</a><a href="/" hreflang="th" lang="th">ภาษาไทย</a></nav>
+      <nav class="u-foot-col" aria-label="On this page"><p>On this page</p><a href="#reel">All menus</a><a href="#how">How it works</a><a href="#trust">Before you start</a><a href="/" hreflang="th" lang="th">ภาษาไทย</a></nav>
       <nav class="u-foot-col" aria-label="Contact and policies"><p>Contact and policies</p><a href="tel:+66892788587">Call +66 89 278 8587</a><a href="/legal/privacy/" hreflang="th">Privacy (Thai)</a><a href="/legal/terms/" hreflang="th">Terms (Thai)</a><a href="/legal/refund/" hreflang="th">Refunds (Thai)</a><a href="/legal/data-deletion/" hreflang="th">Data deletion (Thai)</a></nav>
     </div>
     <div class="shell u-foot-bottom"><span class="footer-copy">© <span id="year">2026</span> naka-ai · NAKA-AI Tech</span><a href="#main">Back to top ↑</a></div>

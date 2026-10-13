@@ -1,0 +1,49 @@
+/* "ฟ้าใส": the clear sky behind the home hero and the closing band (Thai and /en/).
+   CSS only, no canvas or WebGL: a blue gradient, a faint warm sun in the corner and three
+   soft clouds that drift on different periods (24/30/38 s, alternate, so every loop is seamless).
+   In the hero, sky-gl.js paints a shader sky over this one (.has-gl) and the CSS clouds step aside.
+   Markup: <div class="sky" data-sky aria-hidden="true"> with i.sky-sun and three i.sky-cloud, first child
+   of an isolated, overflow-hidden section. sky.js pauses it offscreen or in a hidden tab, and ?t=N
+   freezes every layer N seconds in for screenshots. Reduced motion gets the same sky, standing still. */
+
+.sky { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  background: linear-gradient(180deg, #579edf 0%, #a3d1f5 34%, #c4e3f9 64%, var(--bg, #dfeaf7) 100%); }
+/* the closing band: ground first, the sky in the middle, settling into the footer's colour at the bottom */
+.sky.sky-low { background: linear-gradient(180deg, var(--bg, #dfeaf7) 0%, #c4e3f9 45%, #b9dcf6 75%, #d6e4f3 100%); }
+.sky i { position: absolute; display: block; will-change: transform; }
+
+.sky-sun { top: -38%; right: -14%; width: 72vmax; max-width: 1100px; aspect-ratio: 1;
+  background: radial-gradient(closest-side, rgba(255, 228, 196, .62), rgba(255, 241, 226, .26) 48%, rgba(255, 241, 226, 0) 72%);
+  animation: sky-breathe 18s ease-in-out infinite alternate; }
+/* no sun in the closing band: low on the pale ground it reads as a smudge, not light */
+.sky-low .sky-sun { display: none; }
+
+.sky-cloud { width: clamp(260px, 44vw, 720px); aspect-ratio: 3.2 / 1; opacity: .9; filter: blur(6px);
+  background:
+    radial-gradient(closest-side, #fff, rgba(255, 255, 255, 0)) 6% 74% / 36% 66% no-repeat,
+    radial-gradient(closest-side, #fff, rgba(255, 255, 255, 0)) 32% 42% / 42% 96% no-repeat,
+    radial-gradient(closest-side, rgba(255, 255, 255, .95), rgba(255, 255, 255, 0)) 60% 52% / 42% 86% no-repeat,
+    radial-gradient(closest-side, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0)) 92% 74% / 34% 60% no-repeat;
+  animation: sky-drift 24s ease-in-out infinite alternate; }
+.sky-cloud.c1 { top: 6%; left: -6%; }
+.sky-cloud.c2 { top: 30%; right: -10%; width: clamp(220px, 34vw, 560px); opacity: .8; animation-duration: 30s; animation-direction: alternate-reverse; animation-delay: -11s; }
+.sky-cloud.c3 { top: 58%; left: 22%; width: clamp(200px, 30vw, 500px); opacity: .65; animation-duration: 38s; animation-delay: -23s; }
+.sky-low .sky-cloud.c1 { top: auto; bottom: 8%; }
+.sky-low .sky-cloud.c2 { top: 18%; }
+.sky-low .sky-cloud.c3 { top: auto; bottom: 34%; }
+
+@keyframes sky-drift { from { transform: translate3d(-9vw, 0, 0); } to { transform: translate3d(9vw, 1.5vw, 0); } }
+@keyframes sky-breathe { from { opacity: .8; transform: scale(1); } to { opacity: 1; transform: scale(1.06); } }
+
+.sky.is-paused i { animation-play-state: paused; }
+/* the shader sky: shown on its first frame, no fade, so the page opens on the clouds */
+.sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; }
+.sky.has-gl .sky-canvas { opacity: 1; }
+.sky.has-gl i { animation: none; visibility: hidden; }
+@media (max-width: 760px) {
+  .sky-cloud { filter: blur(4px); }
+  .sky-cloud.c3 { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky i { animation: none; will-change: auto; }
+}

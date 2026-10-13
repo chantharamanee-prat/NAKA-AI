@@ -58,6 +58,29 @@ test('a member gets what the current plan includes; an expired subscription fall
   assert.deepEqual(await enabled('nobody'), []);
 });
 
+test('free trial (0012): every menu for the first 7 days, then free; a paid plan wins; never on sale', async () => {
+  const nowS = Math.floor(Date.now() / 1000);
+  const DAY = 86400;
+  sqlite.exec(`INSERT INTO users (id, display_name, created_at, status) VALUES
+    ('new1', 'ใหม่', ${nowS - DAY}, 'active'), ('old1', 'เกินเจ็ดวัน', ${nowS - 8 * DAY}, 'active'), ('newpaid', 'จ่ายแล้ว', ${nowS - DAY}, 'active');
+    INSERT INTO subscriptions (user_id, plan_id, status, expires_at) VALUES ('newpaid', 'starter', 'active', ${FUTURE});`);
+  const all = (await ent.memberFeatures(env, 'new1')).map(f => f.key);
+  assert.deepEqual(await enabled('new1'), all, 'a day-old member has every landing area and studio menu');
+  assert.ok(all.includes('studio.live') && all.includes('studio.viral_clone') && all.includes('landing.inbox'));
+  assert.equal(sqlite.prepare("SELECT DISTINCT plan_id FROM member_features('new1')").get().plan_id, 'trial');
+  assert.equal((await feature('new1', 'studio.video')).monthlyLimit, 10, 'video stays capped like the starter plan');
+  assert.deepEqual(await enabled('old1'), ['landing.clips', 'landing.marketer'], 'after 7 days: the free plan');
+  assert.ok(!(await enabled('newpaid')).includes('studio.live'), 'a paid plan answers, not the trial');
+  assert.equal(sqlite.prepare('SELECT trial_days() AS d').get().d, 7);
+  assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM plans WHERE id = 'trial' AND (price_thb > 0 OR on_sale = 1)").get().n, 0, 'checkout and coupons list price_thb > 0 only');
+  // the home page promises the same number of days the database grants
+  const { readFileSync } = require('node:fs');
+  for (const page of ['index.html', 'en/index.html']) {
+    const html = readFileSync(path.join(root, 'public', page), 'utf8');
+    assert.match(html, page === 'index.html' ? /ฟรี 7 วัน/ : /free for 7 days/, page);
+  }
+});
+
 test('quota: counted per use, refused at the limit without counting, given back by release; concurrent uses never pass the limit', async () => {
   const uses = [];
   for (let i = 0; i < 4; i++) uses.push(await ent.useFeature(env, 'free1', 'landing.clips'));

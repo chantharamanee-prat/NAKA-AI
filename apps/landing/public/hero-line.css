@@ -92,3 +92,17 @@
   .hero-line .hero-cta { width: 100%; }
   .hl-note { left: 10px; bottom: -16px; font-size: 10px; }
 }
+
+/* Naka at work (hero-line.js): a round screen on the machine running the studio's steps, the step named beside it */
+.hl-naka.is-replaced { display: none; }
+.hl-mascot { position: absolute; left: calc(130px * var(--k, 1)); bottom: calc(250px * var(--k, 1)); width: calc(140px * var(--k, 1)); height: calc(140px * var(--k, 1)); margin-left: calc(-70px * var(--k, 1)); z-index: 1; }
+.hl-mascot-screen { position: absolute; inset: 0; overflow: hidden; border: calc(4px * var(--k, 1)) solid #fff; border-radius: 50%; background: #e8eef4;
+  box-shadow: 0 0 0 calc(3px * var(--k, 1)) rgba(20, 179, 214, calc(.25 + .5 * var(--glow))), 0 12px 26px rgba(13, 27, 51, .22); }
+.hl-mascot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .35s ease; }
+.hl-mascot video.is-on { opacity: 1; }
+.hl-mascot-tag { position: absolute; left: calc(100% - 6px * var(--k, 1)); top: 50%; transform: translateY(-50%); padding: calc(4px * var(--k, 1)) calc(10px * var(--k, 1)) calc(4px * var(--k, 1)) calc(20px * var(--k, 1));
+  border-radius: 999px; background: #fff; box-shadow: 0 6px 16px rgba(13, 27, 51, .14); color: var(--ink); font-size: calc(12.5px * var(--k, 1)); font-weight: 700; white-space: nowrap; }
+.hl-mascot-tag::before { content: ""; position: absolute; left: calc(8px * var(--k, 1)); top: 50%; width: calc(7px * var(--k, 1)); height: calc(7px * var(--k, 1)); margin-top: calc(-3.5px * var(--k, 1)); border-radius: 50%; background: #14b3d6; animation: pulse 1.6s infinite; }
+@media (prefers-reduced-motion: reduce) { .hl-mascot-tag::before { animation: none; } }
+/* the scene starts a little lower so Naka's screen and the hopping phones clear the last line of copy */
+.hero-line .hl-scene { margin-top: 36px; }

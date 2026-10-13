@@ -285,7 +285,8 @@ test('login issues secure hashed session; me reads user; logout revokes it', asy
   // the full schema has auth_passwords, so /me also says whether a password is set (a phone-only member has none)
   const me = await (await f.call('me', undefined, { headers })).json();
   // what the member may use (docs/entitlements.md): a new member is on the free plan
-  assert.deepEqual(me.features.filter(x => x.enabled).map(x => x.key), ['landing.clips', 'landing.marketer']);
+  // a member who signed up today is in the 7-day trial (migrations/pg/0012_free_trial.sql): every feature is on
+  assert.deepEqual(me.features.filter(x => x.enabled).map(x => x.key), me.features.map(x => x.key));
   assert.deepEqual({ ...me, features: undefined }, { user, credits: 0, hasPassword: false, features: undefined });
   assert.deepEqual(await requireUser(f.req('me', undefined, { headers }), f.env), user);
   const logout = await f.call('logout', {}, { headers });

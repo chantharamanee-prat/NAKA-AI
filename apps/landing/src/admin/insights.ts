@@ -74,7 +74,7 @@ async function overview(env: Env): Promise<Response> {
       FROM payments WHERE created_at >= ?2 OR status = 'pending'`).bind(t, today - 6 * DAY).first<Record<string, number>>(),
     db.prepare(`SELECT p.id, p.name, p.price_thb AS price, COUNT(s.user_id) AS members FROM plans p
       LEFT JOIN subscriptions s ON s.plan_id = p.id AND s.status = 'active' AND (s.expires_at IS NULL OR s.expires_at > ?1)
-      WHERE p.id <> 'free' GROUP BY p.id, p.name, p.price_thb ORDER BY p.price_thb, p.id`).bind(t).all<{ id: string; name: string; price: number; members: number }>(),
+      WHERE p.price_thb > 0 GROUP BY p.id, p.name, p.price_thb ORDER BY p.price_thb, p.id`).bind(t).all<{ id: string; name: string; price: number; members: number }>(),
     // used = holds minus refunds (an open studio hold counts: it is off the balance), as reporting.credits_used_by_user
     db.prepare(`SELECT -COALESCE(SUM(delta) FILTER (WHERE reason IN ('job_hold', 'job_refund')), 0) AS landing,
         -COALESCE(SUM(delta) FILTER (WHERE reason IN ('studio_hold', 'studio_refund')), 0) AS studio,

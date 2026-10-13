@@ -1,44 +1,49 @@
-/* naka-ai public look, in the same house as Naka Studio (apps/studio/frontend/app/assets/studio.css):
-   the studio's neutral grey ground and near-black ink, its orange as the one action colour, Kanit for
-   headings and IBM Plex Sans Thai for text. The clips sit on a dark band (--night) so they read like
-   the studio's own previews; the logo and Naka keep their cobalt and white. Loaded LAST on every public
-   page: it restyles what the page stylesheets lay out and adds the home page's own sections
-   (st- studio menus, g- library, s- steps, t- trust, c- closing). Inner pages add ui-pages.css.
-   Orange buttons carry dark text: white on #f97316 is 2.8:1, dark ink is 6.3:1. */
+/* naka-ai public look "ฟ้าใส" (clear sky), in the same house as Naka Studio
+   (apps/studio/frontend/app/assets/studio.css): a sky-tinted blue ground, cloud-navy ink, Naka's
+   own cobalt for accents and links, and the studio's orange kept for ONE job: buttons. Kanit for
+   headings, IBM Plex Sans Thai for text. The hero opens on a clear shader sky with bright clouds
+   (sky-gl.js over sky.css), the closing band shares the CSS sky, the clip library sits on a frosted sky band. Loaded LAST on every public page: it restyles what the
+   page stylesheets lay out and adds the home page's own sections (st- studio menus, g- library,
+   s- steps, t- trust, c- closing). Inner pages add ui-pages.css.
+   Contrast (computed): ink on ground 12.9:1, --ink-2 5.7:1, --ink-3 5.2:1 (4.9:1 on the clip band), cobalt on --u-sky 6.1:1.
+   Orange buttons carry dark text: white on #f97316 is 2.8:1, cloud-navy is 5.6:1. */
 
 :root {
-  --bg: #f7f8fa;
+  --bg: #dfeaf7;
   --surface: #ffffff;
-  --ink: #17181a;
-  --ink-2: #5c6370;
-  --ink-3: #8a919d;
-  --line: #e7e9ee;
+  --ink: #14233b;
+  --ink-2: #4b5b74;
+  --ink-3: #506079;
+  --line: #c8d7e9;
   --action: #f97316;
   --action-hover: #fb8a3c;
-  --brand: #ea580c;
-  --brand-ink: #c2410c;
-  --brand-on-dark: #fb923c;
+  --brand: #1d50be;
+  --brand-ink: #1a46a6;
+  --brand-on-dark: #8daeff;
   --logo-blue: #1d50be;
-  --night: #17181a;
-  --night-2: #232529;
+  /* --night stays for journey.css; the home page no longer uses a dark band */
+  --night: #14233b;
+  --night-2: #1c2d48;
   --night-line: rgba(255, 255, 255, .09);
   --night-ink: #f4f5f7;
-  --night-ink-2: #a9afba;
-  --grad: linear-gradient(0deg, #ea580c, #ea580c);
+  --night-ink-2: #a9b6ca;
+  --grad: linear-gradient(0deg, #1d50be, #1d50be);
   --shadow-sm: none;
-  --shadow-lg: 0 20px 50px rgba(23, 24, 26, .12);
+  --shadow-lg: 0 20px 50px rgba(20, 45, 90, .12);
   --radius: 20px;
   --u-display: "Kanit", "IBM Plex Sans Thai", sans-serif;
   --u-text: "IBM Plex Sans Thai", sans-serif;
-  --u-gray: #eef0f3;
-  --u-gray-2: #e3e6eb;
-  --u-sky: #fff1e7;
-  --u-float: 0 18px 44px rgba(23, 24, 26, .10);
+  --u-gray: #d8e4f2;
+  --u-gray-2: #c9d9ec;
+  --u-sky: #cadcf3;
+  --u-glass: rgba(255, 255, 255, .72);
+  --u-glass-line: rgba(255, 255, 255, .9);
+  --u-float: 0 18px 44px rgba(20, 45, 90, .10);
 }
 body { background: var(--bg); color: var(--ink); font-family: var(--u-text); }
 h1, h2, h3 { font-family: var(--u-display); font-weight: 600; }
 .nw { white-space: nowrap; }
-:focus-visible { outline: 3px solid #fdba74; outline-offset: 3px; border-radius: 10px; }
+:focus-visible { outline: 3px solid #2d66d6; outline-offset: 3px; border-radius: 10px; }
 
 /* ---------- buttons: pills; black is the default action, cobalt the sign-up ---------- */
 .btn { min-height: 48px; padding: 0 22px; gap: 10px; font-weight: 600; box-shadow: none; }
@@ -51,8 +56,9 @@ h1, h2, h3 { font-family: var(--u-display); font-weight: 600; }
 .btn-dark, .btn-dark:hover { background: var(--ink); color: #fff; }
 .btn-dark:hover { background: #2c2e33; }
 .btn-light { background: #fff; color: var(--ink); }
-.btn-night { background: rgba(255, 255, 255, .09); color: #fff; }
-.btn-night:hover { background: rgba(255, 255, 255, .16); }
+/* frosted second action on the sky bands */
+.btn-glass { border-color: var(--u-glass-line); background: var(--u-glass); color: var(--ink); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.btn-glass:hover { background: rgba(255, 255, 255, .92); }
 .btn-sm { min-height: 40px; padding: 0 16px; font-size: 14px; }
 
 /* ---------- floating nav: transparent header, one white rounded bar ---------- */
@@ -64,9 +70,10 @@ h1, h2, h3 { font-family: var(--u-display); font-weight: 600; }
 .landing-nav .nav-row, .landing-nav .mobile-nav { pointer-events: auto; }
 .landing-nav .nav-row {
   width: min(100% - 32px, 1240px); height: 64px; gap: 14px; padding: 0 10px 0 18px;
-  border-radius: 20px; background: #fff; box-shadow: var(--u-float); transition: box-shadow .25s ease;
+  border: 1px solid var(--u-glass-line); border-radius: 20px; background: rgba(255, 255, 255, .8); box-shadow: var(--u-float);
+  -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); transition: box-shadow .25s ease, background-color .25s ease;
 }
-.landing-nav.is-dense .nav-row { box-shadow: 0 18px 44px rgba(14, 22, 38, .18); }
+.landing-nav.is-dense .nav-row { background: rgba(255, 255, 255, .92); box-shadow: 0 18px 44px rgba(20, 45, 90, .16); }
 .landing-nav .brand { font-family: var(--u-display); font-size: 21px; letter-spacing: -.03em; }
 .landing-nav .brand b { color: var(--logo-blue); }
 .brand-tag, .landing-nav .line-no, .landing-nav .fx-led { display: none; }
@@ -96,18 +103,22 @@ h1, h2, h3 { font-family: var(--u-display); font-weight: 600; }
 .landing-nav .mobile-nav .mobile-factory { border-top: 0; }
 .landing-nav .mobile-nav .mobile-cta { border-radius: 999px; background: var(--action); color: var(--ink); }
 
-/* ---------- hero: the same conveyor on the paper ground ---------- */
+/* ---------- hero: the same conveyor under the clear sky (sky-gl.js, sky.css as the fallback) ---------- */
 .hero-line { background: var(--bg); }
 .hero-line::before { display: none; }
 .hl-copy { padding-top: 72px; }
-.hero-line .eyebrow { border: 0; background: #fff; box-shadow: none; }
-.hero-line .pulse { background: var(--action); }
+.hero-line .eyebrow { border: 1px solid var(--u-glass-line); background: var(--u-glass); box-shadow: none; color: var(--ink-2); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.hero-line .pulse { background: var(--brand); box-shadow: 0 0 0 0 rgba(29, 80, 190, .45); animation-name: sky-pulse; }
+@keyframes sky-pulse { 70% { box-shadow: 0 0 0 8px rgba(29, 80, 190, 0); } 100% { box-shadow: 0 0 0 0 rgba(29, 80, 190, 0); } }
 .hero-line h1 { font-size: clamp(40px, 6vw, 82px); line-height: 1.18; letter-spacing: -.01em; font-weight: 600; }
 .hero-line .lead { color: var(--ink-2); }
 .hero-line .quickstart-row.hero-cta { gap: 10px; padding: 0; border: 0; background: none; box-shadow: none; }
+/* the second action is frosted glass on the sky, never a grey slab */
+.hero-line .hero-cta .btn-ghost { border-color: rgba(20, 35, 59, .08); background: var(--u-glass); box-shadow: 0 6px 18px rgba(20, 45, 90, .08); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.hero-line .hero-cta .btn-ghost:hover { background: rgba(255, 255, 255, .92); }
 .hero-line .platforms { justify-content: center; border-top: 0; }
 .hero-line .platforms span { font-size: 13px; color: var(--ink-3); }
-.hero-line .platforms b { font-family: var(--u-display); font-size: 20px; font-weight: 600; color: #a3adbf; letter-spacing: -.01em; }
+.hero-line .platforms b { font-family: var(--u-display); font-size: 20px; font-weight: 600; color: #5d6f8b; letter-spacing: -.01em; }
 
 /* ---------- shared section head ---------- */
 .u-kicker { display: inline-flex; margin: 0 0 16px; padding: 6px 14px; border-radius: 999px; background: var(--u-sky); color: var(--brand-ink); font-size: 13px; font-weight: 600; }
@@ -121,41 +132,50 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
 /* ---------- Naka Studio menus: cards in the studio's own style (white, hairline, 20px corners) ---------- */
 .st-menus { padding: 104px 0; background: var(--bg); }
 .st-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
-.st-card { position: relative; display: flex; flex-direction: column; height: 100%; padding: 22px 22px 20px; border: 1px solid var(--line); border-radius: 20px; background: #fff; transition: border-color .2s ease, transform .2s ease; }
-.st-card:hover { border-color: var(--action); transform: translateY(-2px); }
+.st-card { position: relative; display: flex; flex-direction: column; height: 100%; padding: 22px 22px 20px; border: 1px solid var(--line); border-radius: 20px; background: #fff; transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.st-card:hover { border-color: #9dbcef; transform: translateY(-2px); box-shadow: var(--u-float); }
 .st-card:focus-visible { outline-offset: 2px; }
-.st-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 16px; border-radius: 12px; background: var(--u-sky); color: var(--brand-ink); }
-.st-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.st-menu { font-size: 13px; font-weight: 600; color: var(--ink-3); }
-.st-card b { margin-top: 2px; font-family: var(--u-display); font-size: 21px; font-weight: 600; line-height: 1.35; }
 .st-text { margin-top: 8px; font-size: 14.5px; line-height: 1.7; color: var(--ink-2); }
 .st-go { margin-top: auto; padding-top: 16px; font-size: 14px; font-weight: 600; color: var(--brand-ink); }
-.st-note { margin: 22px 0 0; text-align: center; font-size: 13px; color: var(--ink-3); }
-.st-note a { margin-left: 4px; color: var(--brand-ink); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- clip library (#reel, generated by creative/unsloth-reel/build-reel.cjs) ---------- */
-.g-gallery { position: relative; padding: 104px 0 88px; background: var(--night); color: var(--night-ink); }
+/* the clip library is the one dark band on the page: the site's cloud-navy ink as ground, a cobalt glow at the top,
+   so the clips (the proof) and the orange buttons stand out; light again before and after it.
+   Text on it (computed): white 15.8:1, --night-ink-2 7.7:1, #8DB4FF 7.6:1, #CFE0FF on its pill 8.8:1. */
+.g-gallery { position: relative; padding: 104px 0 88px; color: #fff; background:
+  radial-gradient(60% 420px at 50% 0%, rgba(29, 80, 190, .55), rgba(29, 80, 190, 0) 70%),
+  linear-gradient(180deg, #14233b 0%, #172b4f 40%, #14233b 100%); }
+.g-gallery :focus-visible { outline-color: #8db4ff; }
 .g-shell { width: min(100% - 48px, 1280px); margin-inline: auto; }
 .g-anchor { position: absolute; top: 0; left: 0; scroll-margin-top: 0; }
 .g-head { max-width: 780px; text-align: center; }
-.g-kicker { display: inline-flex; margin: 0 0 18px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .08); color: #c9d3e6; font-size: 13px; font-weight: 600; }
+.g-kicker { display: inline-flex; margin: 0 0 18px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .1); color: #cfe0ff; font-size: 13px; font-weight: 600; }
 .g-head h2 { font-size: clamp(34px, 4.6vw, 60px); line-height: 1.2; letter-spacing: -.01em; color: #fff; }
-.g-head h2 em { font-style: normal; color: var(--brand-on-dark); }
+.g-head h2 em { font-style: normal; color: #8db4ff; }
 .g-sub { max-width: 620px; margin: 16px auto 0; font-size: 17px; line-height: 1.7; color: var(--night-ink-2); }
-.g-tabs { display: flex; gap: 4px; width: fit-content; max-width: 100%; margin-top: 36px; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, .07); overflow-x: auto; scrollbar-width: none; }
-.g-tabs::-webkit-scrollbar { display: none; }
-.g-tabs button { flex: none; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: none; color: #c9d3e6; font-size: 15px; font-weight: 600; white-space: nowrap; cursor: pointer; }
-.g-tabs button span { margin-left: 4px; font-size: 12px; opacity: .6; }
-.g-tabs button:hover { color: #fff; background: rgba(255, 255, 255, .06); }
-.g-tabs button[aria-pressed="true"] { background: #fff; color: var(--ink); }
-.g-panels { margin-top: 22px; margin-bottom: 34px; text-align: center; }
-.g-panel p { max-width: 640px; margin: 0 auto 16px; font-size: 15.5px; line-height: 1.7; color: var(--night-ink-2); }
-.g-panel b { display: inline-flex; margin-right: 6px; padding: 2px 10px; border-radius: 999px; background: var(--action); color: var(--ink); font-size: 12px; vertical-align: 1px; }
-.g-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
-.g-card { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 9 / 16; border-radius: 20px; overflow: hidden; background: var(--night-2); color: #fff; }
+/* one section per studio menu: its real name, what it makes and its button, then a grid of clips.
+   Two rows show; rails.js opens two more per press of "ดูอีก N คลิป" (no sideways scrolling). */
+.g-head { margin-bottom: 8px; }
+.g-head .st-trial { margin-top: 14px; }
+.g-rail { position: relative; margin-top: 56px; scroll-margin-top: 96px; }
+.g-rail-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
+.g-rail-copy { max-width: 760px; }
+.g-menu { display: inline-flex; margin: 0 0 8px; padding: 3px 12px; border-radius: 999px; background: rgba(255, 255, 255, .1); color: #cfe0ff; font-size: 13px; font-weight: 600; }
+.g-rail-head h3 { margin: 0; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.3; color: #fff; }
+.g-count { margin-left: 6px; font-family: var(--u-text); font-size: 14px; font-weight: 600; color: var(--night-ink-2); white-space: nowrap; }
+.g-count b { font-weight: 700; color: #8db4ff; }
+.g-rail-head p:not(.g-menu) { margin: 6px 0 0; font-size: 15px; line-height: 1.65; color: var(--night-ink-2); }
+.g-rail-ctl { display: flex; flex: none; align-items: center; gap: 8px; }
+.g-track { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; width: min(100% - 48px, 1280px); margin-inline: auto; }
 .g-card[hidden] { display: none; }
-/* before gallery.js runs, show the same first rows it will show (no jump on a slow line) */
-.g-gallery:not([data-ready]) .g-grid > .g-card:nth-child(n+11) { display: none; }
+/* before rails.js runs, show the same two rows it will show (no jump on a slow line) */
+.g-gallery:not([data-ready]) .g-track > .g-card:nth-child(n+13) { display: none; }
+.g-more { margin-top: 18px; text-align: center; }
+.g-more-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 24px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: rgba(255, 255, 255, .08); color: #fff; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.g-more-btn:hover { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .36); }
+.g-more-btn[hidden] { display: none; }
+.g-more-menus .st-more { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 0; }
+.g-card { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 9 / 16; border-radius: 20px; overflow: hidden; background: var(--night-2); color: #fff; box-shadow: 0 12px 30px rgba(20, 45, 90, .14); }
 .g-card video { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
 .g-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(8, 12, 24, .35) 0%, rgba(8, 12, 24, 0) 22%, rgba(8, 12, 24, 0) 48%, rgba(8, 12, 24, .9) 100%); }
 .g-card:hover video { transform: scale(1.04); }
@@ -175,27 +195,23 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
 .g-use::after { content: ""; position: absolute; inset: 0; z-index: 1; }
 .g-card:hover .g-use { background: var(--u-sky); }
 .g-use:focus-visible { outline: none; }
-.g-use:focus-visible::after { border-radius: 20px; box-shadow: inset 0 0 0 3px var(--brand-on-dark); }
-/* chat demos: the bot's answers, written out */
-.g-card.g-chat { aspect-ratio: auto; justify-content: flex-start; padding: 16px 14px; background: var(--night-2); }
+.g-use:focus-visible::after { border-radius: 20px; box-shadow: inset 0 0 0 3px #8db4ff; }
+/* chat demos: frosted glass cards, the customer in pearl, the bot in Naka's cobalt */
+.g-card.g-chat { aspect-ratio: auto; justify-content: flex-start; padding: 16px 14px; border: 1px solid var(--u-glass-line); background: var(--u-glass); color: var(--ink); box-shadow: 0 12px 30px rgba(20, 45, 90, .08); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .g-chat::before { content: none; }
-.g-chat .chat-head { margin: 0 0 12px; color: #c9d3e6; }
+.g-chat .chat-head { margin: 0 0 12px; color: var(--ink-2); }
 .g-chat .chat-log li { font-size: 12.5px; }
-.g-chat .chat-log .in { background: #fff; color: var(--ink); box-shadow: none; }
-.g-chat .chat-log .out { background: var(--action); color: var(--ink); }
-.g-chat .chat-log .note { background: rgba(255, 255, 255, .08); color: #c9d3e6; }
-.g-chat-foot { margin: auto 0 0; padding-top: 12px; font-size: 11.5px; color: var(--night-ink-2); }
-.g-more { margin-top: 28px; text-align: center; }
-.g-more-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 24px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: none; color: #fff; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
-.g-more-btn:hover { background: rgba(255, 255, 255, .06); }
-.g-more-btn[hidden] { display: none; }
-.g-note { margin-top: 28px; text-align: center; font-size: 12px; line-height: 1.7; color: #7f8aa3; }
+.g-chat .chat-log .in { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(20, 45, 90, .08); }
+.g-chat .chat-log .out { background: var(--brand); color: #fff; }
+.g-chat .chat-log .note { background: rgba(20, 35, 59, .06); color: var(--ink-2); }
+.g-chat-foot { margin: auto 0 0; padding-top: 12px; font-size: 11.5px; color: var(--ink-3); }
+.g-note { margin-top: 28px; text-align: center; font-size: 12px; line-height: 1.7; color: var(--night-ink-2); }
 
 /* ---------- how it works: three steps ---------- */
 .s-steps { padding: 104px 0; background: var(--bg); }
 .s-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
 .s-step { display: flex; flex-direction: column; padding: 12px 12px 26px; border-radius: 28px; background: #fff; }
-.s-media { position: relative; display: block; aspect-ratio: 1 / 1; margin-bottom: 22px; border-radius: 20px; overflow: hidden; background: #e8eef4; }
+.s-media { position: relative; display: block; aspect-ratio: 1 / 1; margin-bottom: 22px; border-radius: 20px; overflow: hidden; background: var(--u-gray); }
 .s-media video, .s-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
 .s-tag { position: absolute; left: 12px; bottom: 12px; padding: 4px 11px; border-radius: 999px; background: rgba(14, 22, 38, .78); color: #fff; font-size: 12px; font-style: normal; font-weight: 600; }
 .s-step > div { padding: 0 14px; }
@@ -205,7 +221,7 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
 .s-cta { margin-top: 36px; text-align: center; }
 
 /* ---------- trust: numbers, then the guarantees as one compact list ---------- */
-.t-trust { padding: 104px 0; background: #fff; }
+.t-trust { padding: 104px 0; background: #eef4fb; }
 .t-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 0 0 64px; }
 .t-stats div { display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; text-align: center; }
 .t-stats dt { font-size: 14px; color: var(--ink-2); }
@@ -217,36 +233,34 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
 .t-list h3 { font-size: 17px; line-height: 1.4; }
 .t-list p { margin: 4px 0 0; font-size: 14.5px; line-height: 1.7; color: var(--ink-2); }
 
-/* ---------- closing + footer: one dark band to end on ---------- */
-.c-end { padding: 112px 0 80px; background: var(--night); color: var(--night-ink); text-align: center; }
-.c-naka { display: block; width: 132px; height: auto; margin: 0 auto 18px; }
-.c-end h2 { font-size: clamp(34px, 4.6vw, 60px); line-height: 1.2; letter-spacing: -.01em; color: #fff; }
-.c-end p { max-width: 560px; margin: 16px auto 0; font-size: 17px; line-height: 1.7; color: var(--night-ink-2); }
+/* ---------- closing + footer: the hero's sky again, then a pale footer to end on ---------- */
+.c-end { position: relative; isolation: isolate; overflow: hidden; padding: 112px 0 80px; background: var(--bg); color: var(--ink); text-align: center; }
+.c-end > .shell { position: relative; z-index: 1; }
+.c-end h2 { font-size: clamp(34px, 4.6vw, 60px); line-height: 1.2; letter-spacing: -.01em; color: var(--ink); }
+.c-end p { max-width: 560px; margin: 16px auto 0; font-size: 17px; line-height: 1.7; color: var(--ink-2); }
 .c-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
-.u-footer { border-top: 1px solid var(--night-line); background: var(--night); color: var(--night-ink-2); overflow: hidden; }
+.u-footer { border-top: 1px solid var(--line); background: #d6e4f3; color: var(--ink-2); overflow: hidden; }
 .u-foot-grid { display: grid; grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr)); gap: 40px; padding: 64px 0 40px; }
 .u-foot-brand p { max-width: 300px; margin: 16px 0 0; font-size: 14px; line-height: 1.75; }
-.u-footer .brand { font-family: var(--u-display); color: #fff; }
-.u-footer .brand b { color: #8daeff; }
+.u-footer .brand { font-family: var(--u-display); color: var(--ink); }
+.u-footer .brand b { color: var(--logo-blue); }
 .u-foot-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; font-size: 14px; }
-.u-foot-col p { margin: 0 0 4px; font-size: 13px; font-weight: 700; color: #fff; }
-.u-foot-col a { color: var(--night-ink-2); }
-.u-foot-col a:hover { color: #fff; }
-.u-foot-bottom { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; border-top: 1px solid var(--night-line); font-size: 13px; }
-.u-foot-bottom .footer-copy { margin: 0; color: var(--night-ink-2); }
-.u-foot-bottom a:hover { color: #fff; }
-.u-wordmark { margin: 0 0 -.22em; font-family: var(--u-display); font-weight: 700; font-size: clamp(88px, 22vw, 340px); line-height: 1; letter-spacing: -.05em; text-align: center; color: rgba(255, 255, 255, .05); user-select: none; white-space: nowrap; }
+.u-foot-col p { margin: 0 0 4px; font-size: 13px; font-weight: 700; color: var(--ink); }
+.u-foot-col a { color: var(--ink-2); }
+.u-foot-col a:hover { color: var(--brand-ink); }
+.u-foot-bottom { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.u-foot-bottom .footer-copy { margin: 0; color: var(--ink-2); }
+.u-foot-bottom a:hover { color: var(--brand-ink); }
+.u-wordmark { margin: 0 0 -.22em; font-family: var(--u-display); font-weight: 700; font-size: clamp(88px, 22vw, 340px); line-height: 1; letter-spacing: -.05em; text-align: center; color: rgba(29, 80, 190, .07); user-select: none; white-space: nowrap; }
 
 @media (max-width: 1080px) {
+  .g-track { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .g-gallery:not([data-ready]) .g-track > .g-card:nth-child(n+9) { display: none; }
   .landing-nav .nav-links { margin: 0 auto 0 8px; }
   .st-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .g-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .t-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .u-foot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .u-foot-brand { grid-column: 1 / -1; }
-}
-@media (max-width: 900px) {
-  .g-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
   .landing-nav.glass-nav { padding-top: 8px; }
@@ -255,15 +269,14 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
   .hero-line h1 { font-size: clamp(32px, 9.4vw, 48px); }
   .hero-line .quickstart-row.hero-cta { flex-direction: column; }
   .g-gallery { padding: 72px 0 56px; }
+  .g-rail { margin-top: 40px; }
+  .g-rail-head { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .g-rail-head p:not(.g-menu) { font-size: 14px; }
+  .g-track { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: min(100% - 32px, 1280px); }
+  .g-gallery:not([data-ready]) .g-track > .g-card:nth-child(n+5) { display: none; }
+  .g-more-menus .st-more { grid-template-columns: 1fr; }
   .g-shell { width: min(100% - 32px, 1280px); }
   .g-sub { font-size: 15px; }
-  /* tabs scroll sideways on phones; the fade on the right says there is more */
-  .g-tabs { width: auto; margin-top: 26px; -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent); mask-image: linear-gradient(90deg, #000 82%, transparent); }
-  .g-tabs button { min-height: 42px; padding: 0 15px; font-size: 14px; }
-  .g-panels { margin-bottom: 24px; }
-  .g-panel p { font-size: 14.5px; }
-  .g-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .g-gallery:not([data-ready]) .g-grid > .g-card:nth-child(n+7) { display: none; }
   .g-card { border-radius: 16px; }
   .g-cap { padding: 10px; }
   .g-cap .g-title { font-size: 14px; }
@@ -272,14 +285,7 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
   .g-from { top: 52px; right: 10px; width: 42px; }
   .g-card .reel-sound { width: 34px; height: 34px; }
   .s-steps, .t-trust, .st-menus { padding: 72px 0; }
-  /* studio menus: compact rows, icon beside the text, so six fit in about one screen */
   .st-grid { grid-template-columns: 1fr; gap: 8px; }
-  .st-card { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 14px; padding: 14px 16px; border-radius: 16px; }
-  .st-icon { grid-row: 1 / span 3; width: 40px; height: 40px; margin: 0; }
-  .st-card b { font-size: 17px; }
-  .st-text { margin-top: 2px; font-size: 13px; line-height: 1.55; }
-  .st-menu { font-size: 12px; }
-  .st-go { display: none; }
   .u-head { margin-bottom: 28px; }
   .u-head p { font-size: 15px; }
   .s-list { grid-template-columns: 1fr; gap: 10px; }
@@ -295,7 +301,6 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
   .t-stats dd { font-size: 42px; }
   .t-list { grid-template-columns: 1fr; gap: 18px; }
   .c-end { padding: 72px 0 56px; }
-  .c-naka { width: 104px; }
   .c-end p { font-size: 15px; }
   .c-actions .btn { width: 100%; }
   .u-foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 20px; padding-top: 48px; }
@@ -304,4 +309,124 @@ body.acct-signed-in .landing-nav .nav-cta { display: inline-flex; }
 @media (prefers-reduced-motion: reduce) {
   .landing-nav .nav-row, .g-card video { transition: none; }
   .g-card:hover video { transform: none; }
+}
+
+/* ---------- Naka Studio menus: every card shows a clip. The review video leads with the real Thai iced tea
+   clip; drama and AI Live show real outputs; viral clone, seller and marketer show Naka clips tagged as
+   illustration. Clips play only on screen (landing.js) and stay on their poster under reduced motion. ---------- */
+.st-trial { display: inline-flex; align-items: center; gap: 10px; margin: 18px auto 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+.st-badge { padding: 4px 12px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 13px; }
+.st-grid { grid-template-columns: 1.15fr 1fr 1fr; }
+.st-card { display: grid; grid-template-columns: 92px minmax(0, 1fr); grid-template-rows: auto auto 1fr; column-gap: 16px; align-items: start; padding: 14px 18px 14px 14px; }
+.st-card h3 { grid-column: 2; margin: 2px 0 0; font-size: 18px; line-height: 1.4; }
+.st-card .st-text { grid-column: 2; margin-top: 6px; font-size: 13.5px; line-height: 1.65; }
+.st-card .st-go { grid-column: 2; align-self: end; padding-top: 10px; }
+.st-clip { position: relative; grid-row: 1 / span 3; display: block; width: 92px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; background: #0d1830; }
+.st-clip video, .st-shot video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.st-clip em { position: absolute; left: 4px; right: 4px; bottom: 4px; padding: 2px 4px; border-radius: 6px; background: rgba(14, 22, 38, .8); color: #fff; font-size: 10px; font-style: normal; font-weight: 600; line-height: 1.4; text-align: center; }
+.st-clip.is-illus { background: var(--u-gray); }
+.st-clip.is-illus em { background: rgba(255, 255, 255, .92); color: var(--ink-2); }
+.st-start { grid-row: span 3; }
+.st-start .st-card, .st-proof .st-card { display: flex; flex-direction: column; align-items: stretch; }
+.st-start .st-card { padding: 0; overflow: hidden; }
+.st-start h3 { font-size: 23px; }
+.st-shot { position: relative; display: block; flex: 1; min-height: 300px; overflow: hidden; background: #0d1830; }
+.st-shot video { object-position: 50% 40%; }
+.st-shot em { position: absolute; left: 12px; bottom: 12px; padding: 4px 11px; border-radius: 999px; background: rgba(14, 22, 38, .78); color: #fff; font-size: 12px; font-style: normal; font-weight: 600; }
+.st-body { display: flex; flex-direction: column; padding: 18px 22px 20px; }
+.st-body .st-go { padding-top: 14px; }
+.st-flag { align-self: flex-start; margin-bottom: 8px; padding: 3px 10px; border-radius: 999px; background: var(--u-sky); color: var(--brand-ink); font-size: 12.5px; font-weight: 600; }
+.st-proof .st-card { padding: 16px 18px; }
+.st-stack { display: flex; margin-bottom: 12px; }
+.st-stack img { width: 40px; height: 64px; object-fit: cover; border: 2px solid #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(20, 45, 90, .14); }
+.st-stack img + img { margin-left: -12px; }
+.st-note { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; margin-top: 22px; }
+.st-note p { margin: 0; width: 100%; text-align: center; font-size: 13.5px; color: var(--ink-3); }
+.st-note a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--brand-ink); font-size: 14px; font-weight: 600; }
+.st-note a:hover { border-color: #9dbcef; }
+@media (max-width: 1080px) {
+  .st-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-start { grid-column: 1 / -1; grid-row: auto; }
+  .st-start .st-card { flex-direction: row; }
+  .st-shot { flex: 0 0 220px; min-height: 360px; }
+}
+@media (max-width: 760px) {
+  .st-grid { grid-template-columns: 1fr; gap: 8px; }
+  .st-card { grid-template-columns: 64px minmax(0, 1fr); column-gap: 12px; padding: 10px 14px 10px 10px; border-radius: 16px; }
+  .st-clip { width: 64px; border-radius: 10px; }
+  .st-clip em { font-size: 9px; }
+  .st-card h3 { font-size: 16px; }
+  .st-card .st-text { margin-top: 2px; font-size: 13px; line-height: 1.55; }
+  .st-card .st-go { display: none; }
+  .st-start .st-card { flex-direction: row; }
+  .st-shot { flex: 0 0 116px; min-height: 206px; }
+  .st-shot em { left: 6px; right: 6px; bottom: 6px; padding: 3px 6px; font-size: 10px; text-align: center; }
+  .st-body { padding: 12px 14px; }
+  .st-start h3 { font-size: 17px; }
+  .st-body .st-go { display: inline; padding-top: 8px; font-size: 13.5px; }
+  .st-proof .st-card { padding: 12px 14px; }
+  .st-stack { margin-bottom: 8px; }
+}
+
+/* ---------- the studio's menus: in the top bar (they jump to their examples) and as chips under the hero
+   buttons (they open the studio), like a tool's skill picker. Seven menus need room: below 1240px the top
+   bar folds them into the phone menu. ---------- */
+.hero-cta .reel-open { margin-top: 0; min-height: 48px; padding-right: 20px; }
+.hero-menus { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 860px; margin-top: 18px; }
+.hero-menus a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 16px 4px 4px; border: 1px solid var(--u-glass-line); border-radius: 999px;
+  background: var(--u-glass); color: var(--ink); font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20, 45, 90, .06);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: background-color .2s ease, transform .2s ease; }
+.hero-menus a:hover { background: #fff; transform: translateY(-1px); }
+.hero-menus img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+.hero-menus .hero-menus-all { padding-left: 16px; background: transparent; border-color: rgba(20, 35, 59, .12); box-shadow: none; color: var(--brand-ink); }
+.g-more-menus li { scroll-margin-top: 96px; }
+.landing-nav .nav-plain { padding: 8px 12px; }
+@media (max-width: 1240px) {
+  .landing-nav .nav-links { display: none; }
+  .landing-nav .menu-button { display: block; }
+  .landing-nav.glass-nav .mobile-nav:not([hidden]) { display: grid; }
+}
+@media (max-width: 760px) {
+  .hero-menus { gap: 6px; }
+  .hero-menus a { min-height: 40px; padding-right: 12px; font-size: 13px; }
+  .hero-menus img { width: 30px; height: 30px; }
+  .hero-cta .reel-open { width: 100%; justify-content: center; }
+}
+
+/* ---------- sales channels with their marks (assets/platforms.svg): the hero row and "ก่อนเริ่ม" ---------- */
+.pf-logo { display: block; flex: none; width: 20px; height: 20px; }
+.hero-line .platforms b { display: inline-flex; align-items: center; gap: 7px; font-size: 17px; color: var(--ink-2); }
+.t-platforms { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -36px 0 64px; padding: 0; list-style: none; }
+.t-platforms li { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 15px; font-weight: 600; color: var(--ink); }
+.t-platforms .pf-logo { width: 22px; height: 22px; }
+@media (max-width: 760px) {
+  .hero-line .platforms b { font-size: 14px; gap: 5px; }
+  .hero-line .platforms .pf-logo { width: 16px; height: 16px; }
+  .t-platforms { gap: 8px; margin: -24px 0 40px; }
+  .t-platforms li { min-height: 40px; padding: 0 12px 0 10px; font-size: 14px; }
+}
+
+/* light text for the bits of the library that sit on its dark band */
+.g-gallery .st-trial { color: #fff; }
+.g-gallery .st-note p { color: var(--night-ink-2); }
+.g-gallery .g-sub a { color: #cfe0ff; }
+/* chat demos: nearly solid white, frosted glass over navy reads as grey */
+.g-gallery .g-card.g-chat { background: rgba(255, 255, 255, .95); }
+/* the white menu cards keep dark ink (the band's white text would vanish on them) */
+.g-gallery .st-card { color: var(--ink); }
+
+/* ---------- closing band: every Naka clip as a round tile, captioned (showcase/menu/mascot-*.mp4).
+   Sixteen on a computer (two rows of eight), the first eight on a phone. They play only on screen (landing.js). ---------- */
+.c-mascots { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 18px 12px; max-width: 960px; margin: 0 auto 36px; padding: 0; list-style: none; }
+.c-mascots li { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink-2); }
+.c-m { position: relative; display: block; width: 100%; max-width: 104px; aspect-ratio: 1; overflow: hidden; border: 3px solid #fff; border-radius: 50%; background: #e8eef4; box-shadow: 0 10px 22px rgba(20, 45, 90, .16); }
+.c-m video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .c-mascots li { transition: transform .4s cubic-bezier(.16, 1, .3, 1); }
+  .c-mascots li:hover { transform: translateY(-4px); }
+}
+@media (max-width: 760px) {
+  .c-mascots { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 8px; margin-bottom: 28px; }
+  .c-mascots li { font-size: 11.5px; }
+  .c-mascots li:nth-child(n+9) { display: none; }
 }

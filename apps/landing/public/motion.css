@@ -1,0 +1,73 @@
+/* Home page motion language (motion-art-direction, "Premium", calm and soft):
+   one entrance curve, cubic-bezier(.16, 1, .3, 1); base unit .4s (cards .8s, small things .4s);
+   stagger 60 ms, capped at 600 ms; travel at most 24px; no overshoot except the logo's head settling.
+   Hero (primary): the copy rises in over the clear sky (sky-gl.js), its clouds drifting.
+   Support: the logo draws itself once, the headline's blue word catches the light, sections rise in on scroll.
+   Ambient: the clouds. Everything here is skipped under prefers-reduced-motion. */
+
+:root { --m-ease: cubic-bezier(.16, 1, .3, 1); --m-move: cubic-bezier(.65, 0, .35, 1); }
+
+/* ---------- logo (logo-animation: stroke draw-on, then the head settles) ---------- */
+.brand-mark { display: block; flex: none; width: 36px; height: 36px; }
+@media (prefers-reduced-motion: no-preference) {
+  .brand-mark .lm-body { stroke-dasharray: 1 1.01; stroke-dashoffset: 1; animation: lm-draw 1.1s .2s var(--m-move) forwards; }
+  .brand-mark .lm-head { opacity: 0; transform-box: fill-box; transform-origin: 50% 70%; animation: lm-settle .5s calc(1.1s + var(--i, 0) * 60ms) var(--m-ease) forwards; }
+}
+@keyframes lm-draw { to { stroke-dashoffset: 0; } }
+@keyframes lm-settle { from { opacity: 0; transform: scale(.6); } 70% { transform: scale(1.06); } to { opacity: 1; transform: none; } }
+
+/* ---------- hero copy rises in over the sky ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .hl-copy > *, .hero-line .platforms { animation: m-rise .8s var(--m-ease) both; }
+  .hl-copy > :nth-child(1) { animation-delay: .1s; }
+  .hl-copy > :nth-child(2) { animation-delay: .16s; }
+  .hl-copy > :nth-child(3) { animation-delay: .28s; }
+  .hl-copy > :nth-child(4) { animation-delay: .36s; }
+  .hl-copy > :nth-child(5) { animation-delay: .44s; }
+  .hl-copy > :nth-child(6) { animation-delay: .52s; }
+  .hero-line .platforms { animation-delay: .6s; }
+  /* the blue word catches the light once, the sweep interpolated in OKLCH (color-motion) */
+  .hero-line h1 .grad {
+    background: linear-gradient(100deg, #1d50be 0 38%, #7fb8f4 50%, #1d50be 62% 100%);
+    background: linear-gradient(in oklch 100deg, #1d50be 0 38%, #7fb8f4 50%, #1d50be 62% 100%);
+    background-size: 280% 100%; background-position: 100% 0;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: m-shine 1.6s 1.4s var(--m-move) both;
+  }
+}
+@keyframes m-rise { from { opacity: 0; transform: translate3d(0, 24px, 0); } }
+@keyframes m-shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* ---------- scroll reveal (motion.js adds .rv to what is below the fold, then .rv-in) ---------- */
+/* html raises it above the cards' own hover transitions until the reveal is done */
+html .rv { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity .8s var(--m-ease), transform .8s var(--m-ease); }
+html .rv.rv-in { opacity: 1; transform: none; }
+
+/* ---------- hover: cards lift a little (.4s, the base unit) ---------- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .s-step { transition: transform .4s var(--m-ease), box-shadow .4s var(--m-ease); }
+  .s-step:hover { transform: translateY(-3px); box-shadow: var(--u-float); }
+  .g-card { transition: transform .4s var(--m-ease), box-shadow .4s var(--m-ease); }
+  .g-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(20, 45, 90, .2); }
+}
+
+/* ---------- the 15 s reel: a play pill under the hero CTAs, a native dialog ---------- */
+.reel-open { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 18px; padding: 0 18px 0 8px;
+  border: 1px solid var(--u-glass-line); border-radius: 999px; background: var(--u-glass); color: var(--ink); font: inherit; font-size: 14.5px; font-weight: 600;
+  box-shadow: 0 6px 18px rgba(20, 45, 90, .08); cursor: pointer; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: background-color .4s var(--m-ease), transform .4s var(--m-ease); }
+.reel-open:hover { background: #fff; transform: translateY(-1px); }
+.reel-open small { font-size: 12px; font-weight: 500; color: var(--ink-3); }
+.reel-play { position: relative; display: block; width: 30px; height: 30px; border-radius: 50%; background: var(--brand); }
+.reel-play::after { content: ""; position: absolute; left: 12px; top: 9px; border-style: solid; border-width: 6px 0 6px 9px; border-color: transparent transparent transparent #fff; }
+.reel-dialog { width: min(100% - 32px, 1100px); max-width: none; padding: 0; border: 0; border-radius: 20px; background: #0d1830; overflow: visible; }
+.reel-dialog::backdrop { background: rgba(13, 24, 48, .72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.reel-dialog video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 20px 20px 0 0; background: #0d1830; }
+.reel-note { margin: 0; padding: 12px 18px 14px; font-size: 12.5px; color: #a9b6ca; text-align: center; }
+.reel-close { position: absolute; top: -18px; right: -12px; z-index: 1; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: #fff; color: var(--ink); font-size: 26px; line-height: 1; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); cursor: pointer; }
+@media (max-width: 760px) {
+  .reel-close { top: -52px; right: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reel-dialog[open] { animation: m-rise .4s var(--m-ease) both; }
+}

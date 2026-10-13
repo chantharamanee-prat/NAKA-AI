@@ -14,6 +14,7 @@ export const STUDIO_MENUS: Record<string, string> = {
   live: '/live',
   seller: '/seller',
   marketer: '/marketer',
+  social: '/social',
 };
 
 const redirect = (location: string, status = 302) =>

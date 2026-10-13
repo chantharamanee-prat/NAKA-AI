@@ -53,7 +53,9 @@ after(() => { assert.equal(path.dirname(buildDir), path.join(root, '.wrangler'))
 const site = (pathname, init = {}, e = env) => worker.fetch(new Request('https://naka.test' + pathname, {
   ...init, headers: { Authorization: 'Bearer ' + TOKEN, ...(init.json !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(init.headers || {}) },
   ...(init.json !== undefined ? { body: JSON.stringify(init.json) } : {}) }), e, { waitUntil() {} });
-const tabCount = (html, tab) => Number(new RegExp(`data-tab="${tab}"[^>]*>[^<]*<span>(\\d+)</span>`).exec(html)[1]);
+// the clip count in a row's heading (rows: review, drama, live, bot; the review row also holds the Naka clips)
+const railCount = (html, row) => Number(new RegExp(`data-rail-count="${row}">(\\d+)<`).exec(html)[1]);
+const ROWS = ['review', 'drama', 'live', 'bot'];
 const MP4 = () => { const b = new Uint8Array(64); b.set([0, 0, 0, 24], 0); b.set([...'ftypisom'].map(c => c.charCodeAt(0)), 4); return b; };
 const PNG = () => new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
 function uploadForm(fields = {}, files = {}) {
@@ -73,6 +75,7 @@ test('the written gallery: every card found once, with a stable id and its categ
   assert.equal(cards[0].id, 'static:/showcase/h3/review-soap.mp4');
   assert.equal(cards[0].title, 'สบู่สมุนไพรทำมือ');
   assert.ok(cards.some(c => c.id.startsWith('static:chat:') && !c.video));
+  assert.equal(ROWS.reduce((n, r) => n + railCount(HOME, r), 0), cards.length, 'every written card sits in one row, and the headings count them');
   assert.equal(renderGallery(HOME, []), HOME, 'no rows: the page exactly as written');
 });
 
@@ -88,12 +91,14 @@ test('render: hidden cards leave, the order is applied, uploads are escaped, and
   const out = renderGallery(HOME, rows);
   assert.ok(!out.includes(firstReview.html), 'hidden card removed');
   const order = parseGallery(out).cards;
-  assert.equal(order[0].id, 'static:/showcase-media/showcase/v.mp4', 'the upload first (lowest sort)');
-  assert.equal(order[1].id, lastDrama.id, 'then the card moved up');
+  // each row is refilled in the managed order: the upload leads the AI Live row, the moved card leads the drama row
+  assert.equal(order.find(c => c.category === 'live').id, 'static:/showcase-media/showcase/v.mp4', 'the upload first in its row (lowest sort)');
+  assert.equal(order.find(c => c.category === 'drama').id, lastDrama.id, 'the card moved up leads its row');
   assert.ok(out.includes('&lt;img src=x onerror=alert(1)&gt;') && !out.includes('<img src=x onerror'), 'admin text is escaped');
-  assert.equal(tabCount(out, 'review'), tabCount(HOME, 'review') - 1);
-  assert.equal(tabCount(out, 'live'), tabCount(HOME, 'live') + 1);
-  assert.equal(tabCount(out, 'all'), order.length);
+  assert.equal(railCount(out, 'review'), railCount(HOME, 'review') - 1);
+  assert.equal(railCount(out, 'live'), railCount(HOME, 'live') + 1);
+  assert.equal(railCount(out, 'drama'), railCount(HOME, 'drama'));
+  assert.equal(ROWS.reduce((n, r) => n + railCount(out, r), 0), order.length, 'every shown card sits in one row');
   assert.match(out, new RegExp(`คลังคลิปจริง · ${order.filter(c => c.video).length} คลิป`));
 });
 

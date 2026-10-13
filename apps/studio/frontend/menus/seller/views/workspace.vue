@@ -18,39 +18,14 @@
 
       <div class="sw-layout">
         <div class="sw-main">
-          <!-- ===== 1. สินค้า ===== -->
+          <!-- ===== 1. สินค้า + รูป/คลิปที่ถ่ายไว้ ===== -->
           <section class="sw-section">
             <h2 class="sw-section-title"><span class="sw-num">1</span>{{ t('seller.steps.product') }}</h2>
-            <div class="sw-row">
-              <label class="field">
-                <span class="field-label">{{ t('seller.product.name') }} <span class="sw-req">*</span></span>
-                <input v-model="draft.productName" class="input" :placeholder="t('seller.product.namePlaceholder')" />
-              </label>
-              <label class="field sw-price">
-                <span class="field-label">{{ t('seller.product.price') }}</span>
-                <input v-model="draft.productPrice" class="input" :placeholder="t('seller.product.pricePlaceholder')" />
-              </label>
-            </div>
-            <div class="field">
-              <span class="field-label">{{ t('seller.product.url') }}</span>
-              <div class="sw-inline">
-                <input v-model="draft.productUrl" class="input" type="url" :placeholder="t('seller.product.urlPlaceholder')" />
-                <button type="button" class="btn" :disabled="ingesting || !draft.productUrl.trim()" @click="ingest">
-                  <Loader2 v-if="ingesting" :size="13" class="animate-spin" />
-                  <DownloadCloud v-else :size="13" :stroke-width="2" />
-                  {{ t('seller.product.ingest') }}
-                </button>
-              </div>
-            </div>
+            <p class="field-hint">{{ t('seller.steps.productDesc') }}</p>
             <label class="field">
-              <span class="field-label">{{ t('seller.product.affiliate') }}</span>
-              <input v-model="draft.affiliateUrl" class="input" type="url" :placeholder="t('seller.product.affiliatePlaceholder')" />
-              <span class="field-hint">{{ t('seller.product.affiliateHint') }}</span>
-            </label>
-            <label class="field">
-              <span class="field-label">{{ t('seller.product.details') }}</span>
-              <textarea v-model="draft.productDescription" class="textarea" rows="3" :placeholder="t('seller.product.detailsPlaceholder')" />
-              <span class="field-hint">{{ t('seller.product.detailsHint') }}</span>
+              <span class="field-label">{{ t('seller.create.what') }}</span>
+              <input v-model="draft.productName" class="input" :placeholder="t('seller.product.namePlaceholder')" />
+              <span class="field-hint">{{ t('seller.product.nameHint') }}</span>
             </label>
             <div class="field">
               <span class="field-label">{{ t('seller.product.images') }} <span class="sw-count">{{ draft.productImages.length }}/{{ MAX_IMAGES }}</span></span>
@@ -69,11 +44,7 @@
                 <input ref="imageInput" type="file" accept="image/*" multiple hidden @change="uploadImages" />
               </div>
             </div>
-          </section>
-
-          <!-- ===== 2. วิดีโอ ===== -->
-          <section class="sw-section">
-            <h2 class="sw-section-title"><span class="sw-num">2</span>{{ t('seller.steps.video') }}</h2>
+            <h3 class="sw-sub">{{ t('seller.steps.video') }}</h3>
             <div class="sw-video-row">
               <div class="sw-video-box">
                 <video v-if="draft.videoUrl" :src="`${draft.videoUrl}#t=0.1`" :poster="draft.productImages[0]" controls preload="metadata" />
@@ -125,6 +96,37 @@
               :before-start="save"
               @updated="onPostUpdated"
             />
+          </section>
+
+          <!-- ===== 2. รายละเอียด — ลิงก์ affiliate ใส่ทีหลังได้ ===== -->
+          <section class="sw-section">
+            <h2 class="sw-section-title"><span class="sw-num">2</span>{{ t('seller.steps.details') }}</h2>
+            <p class="field-hint">{{ t('seller.steps.detailsDesc') }}</p>
+            <label class="field sw-price">
+              <span class="field-label">{{ t('seller.product.price') }}</span>
+              <input v-model="draft.productPrice" class="input" :placeholder="t('seller.product.pricePlaceholder')" />
+            </label>
+            <div class="field">
+              <span class="field-label">{{ t('seller.product.url') }}</span>
+              <div class="sw-inline">
+                <input v-model="draft.productUrl" class="input" type="url" :placeholder="t('seller.product.urlPlaceholder')" />
+                <button type="button" class="btn" :disabled="ingesting || !draft.productUrl.trim()" @click="ingest">
+                  <Loader2 v-if="ingesting" :size="13" class="animate-spin" />
+                  <DownloadCloud v-else :size="13" :stroke-width="2" />
+                  {{ t('seller.product.ingest') }}
+                </button>
+              </div>
+            </div>
+            <label class="field">
+              <span class="field-label">{{ t('seller.product.affiliate') }}</span>
+              <input v-model="draft.affiliateUrl" class="input" type="url" :placeholder="t('seller.product.affiliatePlaceholder')" />
+              <span class="field-hint">{{ t('seller.product.affiliateHint') }}</span>
+            </label>
+            <label class="field">
+              <span class="field-label">{{ t('seller.product.details') }}</span>
+              <textarea v-model="draft.productDescription" class="textarea" rows="3" :placeholder="t('seller.product.detailsPlaceholder')" />
+              <span class="field-hint">{{ t('seller.product.detailsHint') }}</span>
+            </label>
           </section>
 
           <!-- ===== 3. ช่องทาง + สไตล์ ===== -->
@@ -596,6 +598,7 @@ onBeforeUnmount(() => {
 .field-label { font-size: 11.5px; font-weight: 600; color: var(--text-1); }
 .field-hint { margin: 0; font-size: 11px; color: var(--text-3); line-height: 1.5; }
 .sw-req { color: var(--accent-text); }
+.sw-sub { margin: 4px 0 0; font: 700 13px var(--font-body); color: var(--text-0); }
 .sw-count { margin-left: 4px; font-weight: 500; color: var(--text-3); }
 .sw-row { display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 12px; }
 .sw-inline { display: flex; gap: 8px; }
@@ -658,6 +661,7 @@ onBeforeUnmount(() => {
 .sw-chip.on { border-color: var(--accent); background: var(--accent-bg); color: var(--accent-text); }
 .sw-chip:focus-visible, .sw-tab:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--button-focus); }
 .sw-lang { max-width: 180px; }
+.sw-price { max-width: 220px; }
 .sw-gen { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
 .sw-ready-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 12px; color: var(--text-3); text-align: center; font-size: 12.5px; }
@@ -703,7 +707,7 @@ onBeforeUnmount(() => {
 @media (max-width: 860px) {
   .page { padding: 16px 16px 32px; }
   .sw-row { grid-template-columns: 1fr; }
-  .sw-lang { max-width: none; }
+  .sw-lang, .sw-price { max-width: none; }
   .sw-video-row { flex-direction: column; }
 }
 </style>
