@@ -69,7 +69,7 @@ test('admin sets a price with a reason: audited in system_audit (area price), re
   assert.equal(audit.note, 'ต้นทุนผู้ให้บริการขึ้นราคา');
 
   const listed = await (await call('/prices')).json();
-  assert.equal(listed.prices.length, 5);
+  assert.equal(listed.prices.length, 6);
 });
 
 test('studio videos can be priced per second; other rows cannot; decimals only per second', async () => {
