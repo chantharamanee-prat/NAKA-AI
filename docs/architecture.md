@@ -67,8 +67,10 @@ withSettings(env)            ← ค่าจาก /admin/system/ ทับ env
   → closedFeature            ← สวิตช์ FEATURE_* ปิดพื้นที่ทั้งระบบ → 503
   → handleStudioSso          ← server-to-server ไม่มี Origin จึงอยู่ก่อน handleAuth
   → handleAuth               ← /api/auth/*
-  → ตรวจตาม prefix: /api/{affiliate,social,marketer,inbox,billing,receipts,works,me/*,onboarding}
+  → ตรวจตาม prefix: /api/{affiliate,social,marketer,inbox,line,billing,receipts,works,me/*,onboarding}
                      /webhook/{stripe,meta,line}  ← ตรวจลายเซ็นของผู้ส่ง ไม่ใช้ session
+                     /webhook/line/:token ← OA ของสมาชิกแต่ละราย (line_accounts.webhook_token);
+                       exact-match /webhook/line คือบอทขายกลางตัวเดิม (legacy) ต้องคงไว้
                      /api/admin/*
   → ไม่ตรง → env.ASSETS.fetch (ไฟล์ static ใน public/)
 ```

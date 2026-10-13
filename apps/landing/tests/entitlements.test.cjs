@@ -48,6 +48,7 @@ test('a member gets what the current plan includes; an expired subscription fall
   assert.deepEqual(await enabled('free1'), ['landing.clips', 'landing.marketer']);
   const pro = await enabled('pro1');
   assert.ok(pro.includes('landing.inbox') && pro.includes('studio.viral_clone') && !pro.includes('studio.live'));
+  assert.ok(pro.includes('landing.line_autoreply'), 'pro follows the chat bot (0013 seeds inbox plans)');
   // studio Social Auto Reply (0005) follows the site's own social posting: every paid plan, not free
   assert.ok(pro.includes('studio.social'));
   assert.equal((await feature('pro1', 'landing.ai_video')).monthlyLimit, 30);
@@ -121,7 +122,7 @@ test('admin overrides one member: on with its own limit, off, with an end date, 
   assert.deepEqual({ ...(await feature('free1', 'landing.clips')) }.source, 'plan');
   const detail = await (await customers('/free1')).json();
   assert.ok(detail.features.find(f => f.key === 'landing.clips').enabled);
-  assert.equal(detail.featureCatalog.length, 13);
+  assert.equal(detail.featureCatalog.length, 14);
   assert.deepEqual(detail.overrides.map(o => o.featureKey), ['landing.ai_video']);
   const audit = sqlite.prepare("SELECT action, detail, actor FROM admin_audit WHERE user_id = 'free1' ORDER BY rowid").all().map(r => ({ ...r, detail: JSON.parse(r.detail) }));
   assert.deepEqual(audit.map(a => [a.action, a.detail.feature, a.detail.after && a.detail.after.enabled]),
@@ -136,7 +137,7 @@ test('admin overrides one member: on with its own limit, off, with an end date, 
 
 test('admin sets what a plan includes: members on it follow at once, the change is audited', async () => {
   const before = await (await system('/plans')).json();
-  assert.equal(before.features.length, 13);
+  assert.equal(before.features.length, 14);
   assert.deepEqual(before.plans.find(p => p.id === 'free').features, { 'landing.clips': 3, 'landing.marketer': 5 });
   const response = await system('/plans/free/features', { features: { 'landing.clips': { limit: 10 }, 'studio.drama': { limit: null } }, note: 'โปรโมชัน' }, 'PUT');
   assert.equal(response.status, 200);

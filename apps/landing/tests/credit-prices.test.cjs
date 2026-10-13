@@ -29,7 +29,7 @@ function call(route, data) {
 
 test('seeded prices: studio videos 5 per clip, studio images free, the landing keeps what it charged', async () => {
   const prices = Object.fromEntries((await listPrices(db)).map(p => [p.key, p]));
-  assert.deepEqual(Object.keys(prices), ['studio.video', 'studio.image', 'landing.ai_video', 'landing.clips', 'landing.marketer']);
+  assert.deepEqual(Object.keys(prices), ['studio.video', 'studio.image', 'landing.ai_video', 'landing.clips', 'landing.marketer', 'landing.line_autoreply']);
   assert.equal(prices['studio.video'].credits, 5);
   assert.equal(prices['studio.video'].perSecond, false);
   assert.equal(prices['studio.video'].allowPerSecond, true);
@@ -37,6 +37,7 @@ test('seeded prices: studio videos 5 per clip, studio images free, the landing k
   assert.equal(prices['landing.ai_video'].credits, 5);
   assert.equal(prices['landing.clips'].credits, 1);
   assert.equal(prices['landing.marketer'].credits, 1);
+  assert.equal(prices['landing.line_autoreply'].credits, 0, 'replies are quota-gated, not credit-priced');
   assert.equal(await priceOf(db, 'landing.clips', 99), 1);
   assert.equal(await aiVideoCredits(env), 5);
 });
@@ -68,7 +69,7 @@ test('admin sets a price with a reason: audited in system_audit (area price), re
   assert.equal(audit.note, 'ต้นทุนผู้ให้บริการขึ้นราคา');
 
   const listed = await (await call('/prices')).json();
-  assert.equal(listed.prices.length, 5);
+  assert.equal(listed.prices.length, 6);
 });
 
 test('studio videos can be priced per second; other rows cannot; decimals only per second', async () => {

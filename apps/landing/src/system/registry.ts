@@ -28,6 +28,7 @@ export const SETTINGS: readonly SettingDef[] = [
   feature('FEATURE_CLIPS', 'สร้างคลิปรีวิว', 'ปิดแล้วลูกค้าส่งงานสร้างคลิปใหม่ไม่ได้ งานที่อยู่ในคิวยังทำต่อจนเสร็จ'),
   feature('FEATURE_SOCIAL', 'โพสต์โซเชียลอัตโนมัติ', 'ปิดแล้วหยุดโพสต์ตามเวลาและปิดหน้าเชื่อมเพจ'),
   feature('FEATURE_INBOX', 'AI Inbox', 'ปิดแล้วหยุดตอบแชตเพจอัตโนมัติ ข้อความใหม่ยังถูกเก็บไว้'),
+  feature('FEATURE_LINE_AUTOREPLY', 'ตอบแชท LINE OA อัตโนมัติ', 'ปิดแล้วหยุดตอบแชท LINE OA ของสมาชิก ข้อความใหม่ยังถูกเก็บไว้'),
   feature('FEATURE_MARKETER', 'นักการตลาด AI (สตูดิโอ 05)', 'ปิดแล้วหน้าเมนูนักการตลาด AI และคลิปมาแรงใช้งานไม่ได้'),
   feature('FEATURE_LINE_BOT', 'บอทขายของใน LINE OA', 'ปิดแล้วบอทไม่ตอบลูกค้าใน LINE'),
   feature('FEATURE_GOOGLE_LOGIN', 'ล็อกอินด้วย Google', 'ต้องตั้ง Google Client ID/Secret ด้วยจึงจะแสดงปุ่ม'),
@@ -44,6 +45,7 @@ export const SETTINGS: readonly SettingDef[] = [
   { key: 'STRIPE_WEBHOOK_SECRET', group: 'payments', kind: 'secret', label: 'Stripe webhook secret', help: 'whsec_… ของ endpoint /webhook/stripe', pattern: /^whsec_[A-Za-z0-9]{10,}$/ },
 
   { key: 'ANTHROPIC_API_KEY', group: 'ai', kind: 'secret', label: 'Anthropic API key', help: 'ใช้เขียนสคริปต์คลิป แชตบอท และ AI Inbox', pattern: /^sk-ant-[A-Za-z0-9_-]{10,}$/ },
+  { key: 'LINE_LLM_BACKEND', group: 'ai', kind: 'select', label: 'โมเดลตอบแชท LINE OA', help: 'anthropic = เรียก Anthropic ตรง · studio = ใช้โมเดลของ naka-studio (Stage 3) · ว่าง = anthropic', options: ['anthropic', 'studio'] },
   { key: 'GOOGLE_TTS_API_KEY', group: 'ai', kind: 'secret', label: 'Google Text-to-Speech API key', help: 'เสียงพากย์คลิปรีวิว', pattern: /^[A-Za-z0-9_-]{20,}$/ },
   { key: 'GOOGLE_TTS_VOICE', group: 'ai', kind: 'text', label: 'เสียงพากย์', help: 'เช่น th-TH-Standard-A · ว่าง = ค่าเริ่มต้น', pattern: /^[a-z]{2,3}-[A-Z]{2}-[A-Za-z0-9-]{1,40}$/, max: 60 },
 
