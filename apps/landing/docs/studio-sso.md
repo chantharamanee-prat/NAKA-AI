@@ -22,17 +22,20 @@ naka-studio page (no session)
 | `members` | every naka-ai member |
 | `off` | nobody; the Naka Studio button disappears |
 
-naka-studio keeps one shared workspace today (dramas, campaigns and media are not separated per account).
-Keep `admins` until per-account data is added there, otherwise members see each other's work.
+`members` is safe: naka-studio separates each member's data (`owner_user_id` on every top-level table,
+checked on every request in `apps/studio/backend/src/core/auth/ownership.ts`), and the member's naka-ai
+plan decides which studio menus open (`docs/entitlements.md` at the repo root). Use `admins` only while
+you test the studio yourself; leaving it there keeps every member out.
 
 ## Setup (owner)
 
 1. Make a shared secret (32+ characters of A-Z a-z 0-9 `_` `-`), for example:
    `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`
-2. naka-ai: apply `migrations/0018_studio_sso.sql` to the remote D1 (back up first), then in
+2. naka-ai: the SSO table (`studio_sso_codes`) is part of the PostgreSQL schema in `migrations/pg/`,
+   which `server/migrate.ts` applies at server start — there is nothing to run by hand. In
    `/admin/system/` → **naka-studio (ล็อกอินร่วม)** set
    - `STUDIO_URL` = the studio address, e.g. `https://studio.naka-ai.com`
-   - `STUDIO_ACCESS` = `admins`
+   - `STUDIO_ACCESS` = `members` (or `admins` while you test it alone)
    - `STUDIO_SSO_SECRET` = the secret from step 1
 3. naka-studio server environment:
    - `NAKA_SSO_URL=https://naka-ai.com`
