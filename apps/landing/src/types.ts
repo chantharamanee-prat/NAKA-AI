@@ -61,6 +61,8 @@ export interface Env {
   FEATURE_CLIPS?: string;
   FEATURE_SOCIAL?: string;
   FEATURE_INBOX?: string;
+  FEATURE_LINE_AUTOREPLY?: string;
+  LINE_LLM_BACKEND?: string; // 'anthropic' (default) | 'studio' — which model answers LINE OA chats
   FEATURE_LINE_BOT?: string;
   FEATURE_GOOGLE_LOGIN?: string;
   FEATURE_LINE_LOGIN?: string;

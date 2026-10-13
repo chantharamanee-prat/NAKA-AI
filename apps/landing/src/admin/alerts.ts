@@ -54,7 +54,7 @@ async function recipients(env: Env) {
 /** Push one text to every recipient; answers how many LINE accepted. */
 async function broadcast(env: Env, text: string, to: { id: string }[]): Promise<number> {
   let delivered = 0;
-  for (const r of to) if (await pushText(env, r.id, text).catch(() => false)) delivered++;
+  for (const r of to) if (await pushText(env.LINE_CHANNEL_ACCESS_TOKEN, r.id, text).catch(() => false)) delivered++;
   await env.DB.prepare('INSERT INTO admin_alert_log (text, recipients, delivered, created_at) VALUES (?, ?, ?, ?)')
     .bind(text, to.length, delivered, now()).run();
   return delivered;

@@ -7,6 +7,7 @@ import { featureOn } from "./system/store";
 
 export type FeatureKey =
   | "landing.clips" | "landing.marketer" | "landing.ai_video" | "landing.social" | "landing.inbox"
+  | "landing.line_autoreply"
   | "studio.drama" | "studio.marketer" | "studio.seller" | "studio.product_studio" | "studio.viral_clone"
   | "studio.live" | "studio.video" | "studio.social";
 
@@ -17,6 +18,7 @@ const SYSTEM_SWITCH: Partial<Record<FeatureKey, `FEATURE_${string}`>> = {
   "landing.ai_video": "FEATURE_MARKETER", // AI video lives inside the marketer menu
   "landing.social": "FEATURE_SOCIAL",
   "landing.inbox": "FEATURE_INBOX",
+  "landing.line_autoreply": "FEATURE_LINE_AUTOREPLY",
 };
 
 export interface MemberFeature {

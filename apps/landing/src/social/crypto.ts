@@ -14,6 +14,8 @@ export function keyBytes(env: Env): Uint8Array<ArrayBuffer> {
 }
 // AAD prevents moving ciphertext between users, platforms, or remote accounts.
 export const tokenContext = (user: string, platform: string, external: string) => JSON.stringify(['social-token-v1', user, platform, external]);
+// AAD for a member's own LINE OA credentials: ciphertext cannot move between members or channels.
+export const lineContext = (user: string, channelId: string) => JSON.stringify(['line-channel-v1', user, channelId]);
 export async function encryptToken(env: Env, token: string, context: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', keyBytes(env), 'AES-GCM', false, ['encrypt']);
   const iv = crypto.getRandomValues(new Uint8Array(12));

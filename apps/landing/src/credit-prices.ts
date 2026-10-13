@@ -2,7 +2,7 @@
 // The owner sets the prices in /admin/system/ (ราคาเครดิต); the landing reads them when it queues a job,
 // and Naka Studio reads the same table for its image and video tasks.
 
-export type PriceKey = "studio.video" | "studio.image" | "landing.ai_video" | "landing.clips" | "landing.marketer";
+export type PriceKey = "studio.video" | "studio.image" | "landing.ai_video" | "landing.clips" | "landing.marketer" | "landing.line_autoreply";
 
 export interface CreditPrice {
   key: string;

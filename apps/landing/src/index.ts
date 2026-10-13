@@ -20,6 +20,7 @@ import { readBodyBytes } from "./auth/common";
 import { getBalance, getPlan, grantCredits, ledgerFor } from "./credits";
 import { getConversation, saveConversation } from "./db";
 import { drainInbox, handleInbox, handleMetaWebhook, INBOX_JOB_KIND, makeInboxHandler } from "./inbox";
+import { drainLine, handleLineOa, handleTenantLineWebhook, LINE_JOB_KIND, makeLineReplyHandler } from "./line-oa";
 import { runQueue, errorSummary, type JobHandler } from "./jobs";
 import { getDisplayName, pushText, replyOrPush, startLoading, verifySignature } from "./line";
 import { handleSocial, publishDuePosts } from "./social";
@@ -101,6 +102,12 @@ export default {
       if (!(await hasFeature(env, user.id, "landing.inbox"))) return featureRefusal({ reason: "disabled" }, " AI Inbox");
       return (await handleInbox(request, env, url, user.id)) ?? json({ error: "not found" }, 404);
     }
+    if (url.pathname === "/api/line" || url.pathname.startsWith("/api/line/")) {
+      const user = await requireUser(request, env);
+      if (!user) return json({ error: "กรุณาเข้าสู่ระบบ" }, 401);
+      if (!(await hasFeature(env, user.id, "landing.line_autoreply"))) return featureRefusal({ reason: "disabled" }, "ตอบแชท LINE OA อัตโนมัติ");
+      return (await handleLineOa(request, env, url, user.id)) ?? json({ error: "not found" }, 404);
+    }
     if (url.pathname.startsWith("/api/billing/")) {
       const user = await requireUser(request, env);
       if (!user) return json({ error: "กรุณาเข้าสู่ระบบ" }, 401);
@@ -136,6 +143,7 @@ export default {
     // Meta authenticates with X-Hub-Signature-256, not a session.
     if (url.pathname === "/webhook/meta") return handleMetaWebhook(request, env, ctx);
     if (url.pathname === "/webhook/line" && request.method === "POST") return handleLineWebhook(request, env, ctx);
+    if (request.method === "POST" && url.pathname.startsWith("/webhook/line/")) return (await handleTenantLineWebhook(request, env, ctx)) ?? json({ error: "not found" }, 404);
     if (url.pathname === "/api/health") return json({ ok: true });
     if (url.pathname === "/api/plans") return handlePublicPlans(request, env);
     // site content from the back office: the announcement line and uploaded showcase clips (src/content)
@@ -253,6 +261,11 @@ export default {
       (result) => { if (result.receipts || result.enqueued) console.log("inbox", result.receipts, result.enqueued); },
       () => console.error("inbox drain failed"),
     ));
+    // Same for the member's own LINE OAs; kept separate so one drain cannot starve the other.
+    if (featureOn(env, "FEATURE_LINE_AUTOREPLY")) ctx.waitUntil(drainLine(env, { maxReceipts: 5, maxMessages: 20 }).then(
+      (result) => { if (result.receipts || result.enqueued) console.log("line-oa", result.receipts, result.enqueued); },
+      () => console.error("line drain failed"),
+    ));
   },
 } satisfies ExportedHandler<Env>;
 
@@ -273,11 +286,12 @@ function closedFeature(env: Env, url: URL, method: string): Response | null {
   // Signed media links stay open: Instagram may still be fetching a clip for a post already sent.
   if (!featureOn(env, "FEATURE_SOCIAL") && under("/api/social") && !path.startsWith("/api/social/media/")) return json({ error: CLOSED }, 503);
   if (!featureOn(env, "FEATURE_INBOX") && under("/api/inbox")) return json({ error: CLOSED }, 503);
+  if (!featureOn(env, "FEATURE_LINE_AUTOREPLY") && under("/api/line")) return json({ error: CLOSED }, 503);
   return null;
 }
 
 function jobHandlers(env: Env): Record<string, JobHandler> {
-  return { [AFFILIATE_JOB_KIND]: makeAffiliateHandler(env), [INBOX_JOB_KIND]: makeInboxHandler(env), ...makeMarketerHandlers(env), [AI_VIDEO_JOB_KIND]: makeAiVideoHandler(env) };
+  return { [AFFILIATE_JOB_KIND]: makeAffiliateHandler(env), [INBOX_JOB_KIND]: makeInboxHandler(env), [LINE_JOB_KIND]: makeLineReplyHandler(env), ...makeMarketerHandlers(env), [AI_VIDEO_JOB_KIND]: makeAiVideoHandler(env) };
 }
 
 const LINE_WEBHOOK_MAX_BYTES = 256 * 1024; // LINE payloads are small; anything larger is refused unread
@@ -295,7 +309,7 @@ async function handleLineWebhook(request: Request, env: Env, ctx: ExecutionConte
   // the same OA (src/admin/alerts.ts), also while the shop bot is off.
   ctx.waitUntil(Promise.all(events.map(async (e) => {
     try {
-      if (await handleAlertCommand(env, e, (id) => getDisplayName(env, id))) return;
+      if (await handleAlertCommand(env, e, (id) => getDisplayName(env.LINE_CHANNEL_ACCESS_TOKEN, id))) return;
       if (botOn) await handleLineEvent(env, e);
     } catch (err) { console.error("event failed", errorSummary(err)); }
   })));
@@ -307,7 +321,7 @@ async function handleLineEvent(env: Env, event: LineEvent): Promise<void> {
   if (event.type !== "message" || !userId || !event.replyToken || event.source.type !== "user") return;
 
   const conv = await getConversation(env.DB, userId);
-  if (!conv.display_name) conv.display_name = await getDisplayName(env, userId);
+  if (!conv.display_name) conv.display_name = await getDisplayName(env.LINE_CHANNEL_ACCESS_TOKEN, userId);
 
   if (conv.human_mode) {
     // Admin is handling this chat; just log the message for the dashboard.
@@ -319,7 +333,7 @@ async function handleLineEvent(env: Env, event: LineEvent): Promise<void> {
   if (event.message?.type !== "text" || !event.message.text) {
     const isImage = event.message?.type === "image";
     await replyOrPush(
-      env,
+      env.LINE_CHANNEL_ACCESS_TOKEN,
       event.replyToken,
       userId,
       isImage ? "ได้รับรูปแล้วค่ะ 🙏 แอดมินจะตรวจสอบและตอบกลับเร็ว ๆ นี้นะคะ" : "ตอนนี้นาคาอ่านได้เฉพาะข้อความตัวอักษรค่ะ รบกวนพิมพ์มาได้เลยนะคะ 😊",
@@ -334,10 +348,10 @@ async function handleLineEvent(env: Env, event: LineEvent): Promise<void> {
     return;
   }
 
-  await startLoading(env, userId);
+  await startLoading(env.LINE_CHANNEL_ACCESS_TOKEN, userId);
   const reply = await runSalesAgent(env, conv, event.message.text);
   await saveConversation(env.DB, conv);
-  await replyOrPush(env, event.replyToken, userId, reply);
+  await replyOrPush(env.LINE_CHANNEL_ACCESS_TOKEN, event.replyToken, userId, reply);
 }
 
 async function handleAdmin(request: Request, env: Env, url: URL): Promise<Response> {
@@ -423,7 +437,7 @@ async function handleAdmin(request: Request, env: Env, url: URL): Promise<Respon
       // Admin sends a message to the customer on LINE.
       const userId = decodeURIComponent(path[1]);
       const { text } = await body<{ text: string }>();
-      if (!(await pushText(env, userId, text))) return json({ error: "LINE push failed" }, 502);
+      if (!(await pushText(env.LINE_CHANNEL_ACCESS_TOKEN, userId, text))) return json({ error: "LINE push failed" }, 502);
       const conv = await getConversation(db, userId);
       conv.history.push({ role: "assistant", content: `[แอดมิน] ${text}` });
       await saveConversation(db, conv);
